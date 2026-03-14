@@ -135,7 +135,7 @@ class RegistrationWizardController extends Controller
         $selectedVenueId = request('venue_id') ?? ($draft['venue_id'] ?? null);
 
         // Auto-select default venue on first visit
-        if (! $selectedVenueId) {
+        if (!$selectedVenueId) {
             $defaultId = Venue::query()
                 ->where('name', self::DEFAULT_VENUE_NAME)
                 ->value('id');
@@ -179,7 +179,7 @@ class RegistrationWizardController extends Controller
             ->where('status', 'active')
             ->first();
 
-        if (! $session) {
+        if (!$session) {
             throw ValidationException::withMessages([
                 'event_session_id' => 'Suất diễn không hợp lệ.',
             ]);
@@ -218,10 +218,10 @@ class RegistrationWizardController extends Controller
         $number = preg_replace('/\D+/', '', (string) ($data['phone_number'] ?? ''));
         if ($number !== '') {
             $country = $country !== '' ? $country : '+84';
-            if (! str_starts_with($country, '+')) {
-                $country = '+'.$country;
+            if (!str_starts_with($country, '+')) {
+                $country = '+' . $country;
             }
-            $phone = $country.$number;
+            $phone = $country . $number;
         }
 
         $draft = Session::get(self::DRAFT_KEY, []);
@@ -254,20 +254,28 @@ class RegistrationWizardController extends Controller
             'child_count' => ['required', 'integer', 'min:0', 'max:999'],
         ]);
 
-        $total = (int) $data['adult_count'] + (int) $data['ntl_count'] + (int) $data['ntl_new_count'] + (int) $data['child_count'];
-        if ($total <= 0) {
+        $draft = Session::get(self::DRAFT_KEY, []);
+        $attendWithGuest = (bool) ($draft['attend_with_guest'] ?? false);
+
+        $guestTotal =
+            (int) $data['adult_count'] +
+            (int) $data['ntl_count'] +
+            (int) $data['ntl_new_count'] +
+            (int) $data['child_count'];
+
+        if ($guestTotal <= 0) {
             throw ValidationException::withMessages([
                 'adult_count' => 'Tổng số khách phải lớn hơn 0.',
             ]);
         }
 
-        $draft = Session::get(self::DRAFT_KEY, []);
-        $attendWithGuest = (bool) ($draft['attend_with_guest'] ?? false);
-        if ($attendWithGuest && $total < 2) {
+        if ($attendWithGuest && $guestTotal < 1) {
             throw ValidationException::withMessages([
-                'adult_count' => 'Vui lòng tính cả số lượng của bạn vì bạn có đi cùng khách.',
+                'adult_count' => 'Vui lòng chọn ít nhất 1 khách đi cùng.',
             ]);
         }
+
+        $total = $guestTotal + ($attendWithGuest ? 1 : 0);
 
         $draft = array_merge($draft, $data);
         $draft['total_count'] = $total;
@@ -282,7 +290,7 @@ class RegistrationWizardController extends Controller
         $session = null;
         $venue = null;
 
-        if (! empty($draft['event_session_id'])) {
+        if (!empty($draft['event_session_id'])) {
             $session = EventSession::query()->with('venue')->find($draft['event_session_id']);
             $venue = $session?->venue;
         }
@@ -299,7 +307,7 @@ class RegistrationWizardController extends Controller
         $draft = Session::get(self::DRAFT_KEY, []);
         $required = ['venue_id', 'event_session_id', 'full_name', 'email', 'adult_count', 'ntl_count', 'ntl_new_count', 'child_count', 'total_count'];
         foreach ($required as $key) {
-            if (! array_key_exists($key, $draft)) {
+            if (!array_key_exists($key, $draft)) {
                 return redirect()->to('/register');
             }
         }
@@ -351,7 +359,7 @@ class RegistrationWizardController extends Controller
 
         Session::forget(self::DRAFT_KEY);
 
-        return redirect()->to('/register/success/'.$registration->id);
+        return redirect()->to('/register/success/' . $registration->id);
     }
 
     public function success(int $id)

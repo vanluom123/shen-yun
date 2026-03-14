@@ -60,6 +60,7 @@ function initCounters() {
 
     const rows = root.querySelectorAll('[data-counter-row]');
     const totalEl = root.querySelector('[data-counter-total]');
+    const selfExtra = Number(root.getAttribute('data-counter-self') || 0);
 
     const clamp = (v) => Math.max(0, Math.min(999, v));
 
@@ -69,6 +70,7 @@ function initCounters() {
             const input = row.querySelector('[data-counter-input]');
             total += Number(input?.value || 0);
         });
+        total += selfExtra;
         if (totalEl) totalEl.textContent = String(total);
     };
 

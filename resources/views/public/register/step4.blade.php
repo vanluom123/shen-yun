@@ -45,6 +45,9 @@
                 </div>
                 <div class="mt-4 text-lg font-semibold text-[#d9b76f]">
                     Tổng cộng: <span class="text-neutral-100">{{ $draft['total_count'] ?? 0 }}</span> khách
+                    @if (!empty($draft['attend_with_guest']))
+                        <span class="text-sm font-medium text-neutral-200/70">(đã gồm bạn)</span>
+                    @endif
                 </div>
             </div>
         </div>

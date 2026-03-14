@@ -12,7 +12,9 @@
         $attendWithGuest = (bool) ($draft['attend_with_guest'] ?? false);
 
         $defaults = [
-            'adult_count' => $attendWithGuest ? 2 : 1,
+            // NOTE: counters represent number of guests (do NOT include registrant).
+            // If "attend_with_guest" is on, the system will auto-add 1 seat for the registrant.
+            'adult_count' => 1,
             'ntl_count' => 0,
             'ntl_new_count' => 0,
             'child_count' => 0,
@@ -37,7 +39,13 @@
         </div>
     @endif
 
-    <form method="post" action="{{ url('/register/step3') }}" class="mt-6 space-y-6" data-counter-root>
+    <form
+        method="post"
+        action="{{ url('/register/step3') }}"
+        class="mt-6 space-y-6"
+        data-counter-root
+        data-counter-self="{{ $attendWithGuest ? 1 : 0 }}"
+    >
         @csrf
 
         <div class="space-y-5">
