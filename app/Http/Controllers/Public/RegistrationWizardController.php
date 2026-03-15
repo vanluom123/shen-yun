@@ -175,13 +175,16 @@ class RegistrationWizardController extends Controller
         $sessions = collect();
         $registrationBlocked = false;
         if ($selectedVenueId) {
-            // Only allow choosing 1 week: keep exactly one active Sunday session,
-            // and auto-roll to next week when within 24h of the showtime.
-            // Returns null when admin has blocked all upcoming weeks.
-            $session = $this->ensureSingleActiveSundaySession((int) $selectedVenueId);
-            if ($session !== null) {
-                $sessions = collect([$session]);
-            } else {
+            $this->ensureSingleActiveSundaySession((int) $selectedVenueId);
+
+            $sessions = EventSession::query()
+                ->where('venue_id', $selectedVenueId)
+                ->where('starts_at', '>=', Carbon::now(self::EVENT_TZ))
+                ->orderBy('starts_at')
+                ->get();
+
+            $activeSessions = $sessions->where('status', 'active');
+            if ($activeSessions->isEmpty() && $sessions->isNotEmpty()) {
                 $registrationBlocked = true;
             }
         }
@@ -218,6 +221,13 @@ class RegistrationWizardController extends Controller
         if ($session->is_registration_blocked) {
             throw ValidationException::withMessages([
                 'event_session_id' => 'Suất diễn này đang tạm hoãn nhận đăng ký.',
+            ]);
+        }
+
+        $remaining = $session->capacity_total - $session->capacity_reserved;
+        if ($remaining <= 0) {
+            throw ValidationException::withMessages([
+                'event_session_id' => 'Suất diễn này đã hết chỗ.',
             ]);
         }
 

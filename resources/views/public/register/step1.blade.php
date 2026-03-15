@@ -53,8 +53,11 @@
                             $remaining = max(0, $s->capacity_total - $s->capacity_reserved);
                             $dateLabel = $dow[(int) $s->starts_at->format('w')].', '.$s->starts_at->format('d/m/Y');
                             $isSelected = (string) $selectedSessionId === (string) $s->id;
+                            $isFullyBooked = $remaining <= 0;
+                            $isPostponed = $s->is_registration_blocked;
+                            $isDisabled = $isFullyBooked || $isPostponed;
                         @endphp
-                        <label class="block cursor-pointer">
+                        <label class="block {{ $isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer' }}">
                             <input
                                 type="radio"
                                 name="event_session_id"
@@ -62,11 +65,20 @@
                                 class="sr-only"
                                 data-session-radio
                                 required
+                                {{ $isDisabled ? 'disabled' : '' }}
                                 {{ $isSelected ? 'checked' : '' }}
                             />
-                            <div class="rsvp-card {{ $isSelected ? 'rsvp-card-selected' : '' }}" data-session-card>
+                            <div class="rsvp-card {{ $isSelected ? 'rsvp-card-selected' : '' }} {{ $isDisabled ? 'border-neutral-500/30 bg-black/10' : '' }}" data-session-card>
                                 <div class="text-base font-semibold text-[#f3e2b6]">{{ $dateLabel }}</div>
-                                <div class="mt-1 text-sm text-neutral-200/75">còn {{ $remaining }} chỗ</div>
+                                <div class="mt-1 text-sm text-neutral-200/75">
+                                    @if ($isPostponed)
+                                        Tạm hoãn
+                                    @elseif ($isFullyBooked)
+                                        Hết chỗ
+                                    @else
+                                        còn {{ $remaining }} chỗ
+                                    @endif
+                                </div>
                             </div>
                         </label>
                     @endforeach
