@@ -32,13 +32,15 @@
         </div>
     @endif
 
-    <form method="post" id="bulk-delete-form" action="{{ url('/admin/sessions/bulk-destroy') }}">
+    <form method="post" id="bulk-delete-form" action="{{ url('/admin/sessions/bulk-destroy') }}" class="hidden">
         @csrf
         @method('DELETE')
+        <div id="bulk-delete-inputs"></div>
+    </form>
 
-        <div class="mt-6 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-            <table class="w-full text-sm">
-                <thead class="bg-neutral-50 text-left text-xs font-semibold text-neutral-600">
+    <div class="mt-6 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+        <table class="w-full text-sm">
+            <thead class="bg-neutral-50 text-left text-xs font-semibold text-neutral-600">
                     <tr>
                         <th class="px-4 py-3 w-10">
                             <input type="checkbox" id="select-all" class="rounded border-neutral-300">
@@ -130,8 +132,7 @@
                 @endforelse
             </tbody>
         </table>
-        </div>
-    </form>
+    </div>
 
     <div class="mt-4">
         {{ $sessions->links() }}
@@ -159,9 +160,20 @@
         }
 
         function confirmBulkDelete() {
-            const count = document.querySelectorAll('.session-checkbox:checked').length;
+            const checkboxes = document.querySelectorAll('.session-checkbox:checked');
+            const count = checkboxes.length;
             if (confirm('Xoá ' + count + ' suất diễn đã chọn? Tất cả đăng ký liên quan cũng sẽ bị xoá.')) {
-                document.getElementById('bulk-delete-form').submit();
+                const form = document.getElementById('bulk-delete-form');
+                const inputsContainer = document.getElementById('bulk-delete-inputs');
+                inputsContainer.innerHTML = '';
+                checkboxes.forEach(cb => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'session_ids[]';
+                    input.value = cb.value;
+                    inputsContainer.appendChild(input);
+                });
+                form.submit();
             }
         }
     </script>

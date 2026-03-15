@@ -55,7 +55,8 @@
                             $isSelected = (string) $selectedSessionId === (string) $s->id;
                             $isFullyBooked = $remaining <= 0;
                             $isPostponed = $s->is_registration_blocked;
-                            $isDisabled = $isFullyBooked || $isPostponed;
+                            $isInactive = $s->status !== 'active';
+                            $isDisabled = $isFullyBooked || $isPostponed || $isInactive;
                         @endphp
                         <label class="block {{ $isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer' }}">
                             <input
@@ -71,7 +72,9 @@
                             <div class="rsvp-card {{ $isSelected ? 'rsvp-card-selected' : '' }} {{ $isDisabled ? 'border-neutral-500/30 bg-black/10' : '' }}" data-session-card>
                                 <div class="text-base font-semibold text-[#f3e2b6]">{{ $dateLabel }}</div>
                                 <div class="mt-1 text-sm text-neutral-200/75">
-                                    @if ($isPostponed)
+                                    @if ($isInactive && !$isPostponed)
+                                        Đã đóng
+                                    @elseif ($isPostponed)
                                         Tạm hoãn
                                     @elseif ($isFullyBooked)
                                         Hết chỗ

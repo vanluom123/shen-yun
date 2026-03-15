@@ -180,9 +180,25 @@ class RegistrationWizardController extends Controller
         if ($selectedVenueId) {
             $this->ensureSingleActiveSundaySession((int) $selectedVenueId);
 
+            $now = Carbon::now(self::EVENT_TZ);
+            $baseSunday = $now->copy();
+            if ($baseSunday->dayOfWeek !== Carbon::SUNDAY) {
+                $baseSunday = $baseSunday->next(Carbon::SUNDAY);
+            }
+            $baseSunday = $baseSunday->setTime(self::EVENT_HOUR, self::EVENT_MINUTE, 0);
+            $nextSunday = $baseSunday->copy()->addWeek();
+
+            $dayStart = $baseSunday->copy()->startOfDay();
+            $dayEnd = $baseSunday->copy()->endOfDay();
+            $nextDayStart = $nextSunday->copy()->startOfDay();
+            $nextDayEnd = $nextSunday->copy()->endOfDay();
+
             $sessions = EventSession::query()
                 ->where('venue_id', $selectedVenueId)
-                ->where('starts_at', '>=', Carbon::now(self::EVENT_TZ))
+                ->where(function ($query) use ($dayStart, $dayEnd, $nextDayStart, $nextDayEnd) {
+                    $query->whereBetween('starts_at', [$dayStart, $dayEnd])
+                          ->orWhereBetween('starts_at', [$nextDayStart, $nextDayEnd]);
+                })
                 ->orderBy('starts_at')
                 ->get();
 
