@@ -394,7 +394,7 @@ class RegistrationWizardController extends Controller
                 ->update(['capacity_reserved' => $newReserved]);
             $session->capacity_reserved = $newReserved;
 
-            $registration = Registration::query()->create([
+            return Registration::query()->create([
                 'event_session_id' => $session->id,
                 'full_name' => $draft['full_name'],
                 'email' => $draft['email'],
