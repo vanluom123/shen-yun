@@ -15,23 +15,61 @@
                     <p class="mt-1 text-sm text-neutral-700/80">Xem và xuất file Excel (CSV).</p>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <select
-                        onchange="window.location.href = '{{ url('/admin/registrations') }}?' + (this.value ? 'status=' + this.value : '')"
-                        class="rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900"
-                    >
-                        <option value="" {{ empty($statusFilter) ? 'selected' : '' }}>Tất cả</option>
-                        <option value="confirmed" {{ $statusFilter === 'confirmed' ? 'selected' : '' }}>Đã xác nhận</option>
-                        <option value="cancelled" {{ $statusFilter === 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
-                    </select>
-                </div>
-
                 <a
-                    href="{{ url('/admin/registrations/export.xls') }}"
-                    class="inline-flex items-center justify-center rounded-2xl bg-neutral-900 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800"
+                    href="{{ url('/admin/registrations/export.xls') }}?status={{ $statusFilter }}&session_id={{ $sessionIdFilter }}"
+                    class="inline-flex items-center justify-center rounded-3xl bg-[#1a1a1a] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800"
                 >
                     Xuất Excel
                 </a>
+            </div>
+
+            <div class="mt-5 flex flex-wrap items-center gap-3">
+                <div class="relative">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <select
+                        id="sessionFilter"
+                        class="w-auto min-w-[200px] appearance-none rounded-full border border-neutral-200 bg-white py-2 pl-9 pr-8 text-sm text-neutral-700 outline-none hover:bg-neutral-50 focus:border-neutral-300"
+                        onchange="applyFilters()"
+                    >
+                        <option value="">Suất diễn: Tất cả</option>
+                        @foreach($sessions as $session)
+                            <option value="{{ $session->id }}" {{ $sessionIdFilter == $session->id ? 'selected' : '' }}>
+                                Suất diễn: {{ $session->starts_at->format('d/m/Y H:i') }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-neutral-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-3 w-3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm0 0H4.5M13.5 12h6.75M13.5 12a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm0 0H4.5m0 6h15" />
+                        </svg>
+                    </div>
+                    <select
+                        id="statusFilter"
+                        class="w-auto min-w-[180px] appearance-none rounded-full border border-neutral-200 bg-white py-2 pl-9 pr-8 text-sm text-neutral-700 outline-none hover:bg-neutral-50 focus:border-neutral-300"
+                        onchange="applyFilters()"
+                    >
+                        <option value="" {{ empty($statusFilter) ? 'selected' : '' }}>Trạng thái: Tất cả</option>
+                        <option value="confirmed" {{ $statusFilter === 'confirmed' ? 'selected' : '' }}>Trạng thái: Đã xác nhận</option>
+                        <option value="cancelled" {{ $statusFilter === 'cancelled' ? 'selected' : '' }}>Trạng thái: Đã hủy</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-neutral-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-3 w-3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -68,7 +106,19 @@
                                 <div class="text-neutral-900">{{ $r->email }}</div>
                             </td>
                             <td class="px-5 py-4 whitespace-nowrap">
-                                <div class="text-neutral-900">{{ $r->phone ?: '—' }}</div>
+                                @if($r->phone)
+                                    <details class="phone-dropdown relative">
+                                        <summary class="list-none cursor-pointer text-neutral-900 hover:underline">
+                                            {{ $r->phone }}
+                                        </summary>
+                                        <div class="absolute z-10 mt-1 w-24 rounded-lg border border-neutral-200 bg-white py-1 shadow-lg">
+                                            <a href="tel:{{ $r->phone }}" class="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100">Call</a>
+                                            <a href="https://zalo.me/{{ $r->phone }}" target="_blank" class="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100">Zalo</a>
+                                        </div>
+                                    </details>
+                                @else
+                                    <div class="text-neutral-900">—</div>
+                                @endif
                             </td>
                             <td class="px-5 py-4 whitespace-nowrap">
                                 <div class="font-semibold text-neutral-900">{{ $r->eventSession->starts_at->format('d/m/Y H:i') }}</div>
@@ -80,9 +130,9 @@
                             <td class="px-5 py-4 font-semibold text-neutral-900">{{ $r->total_count }}</td>
                             <td class="px-5 py-4">
                                 @if($r->status === 'confirmed')
-                                    <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800">Đã xác nhận</span>
+                                    <span class="text-lg" title="Đã xác nhận">✅</span>
                                 @else
-                                    <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-semibold text-red-800">Đã hủy</span>
+                                    <span class="text-lg" title="Đã hủy">❌</span>
                                 @endif
                             </td>
                             <td class="px-5 py-4 text-neutral-800 whitespace-nowrap">{{ $r->created_at->format('d/m/Y H:i') }}</td>
@@ -106,5 +156,58 @@
     <div class="mt-4">
         {{ $registrations->links() }}
     </div>
+
+    <script>
+        let autoCloseTimer = null;
+
+        function startAutoCloseTimer(details) {
+            clearTimeout(autoCloseTimer);
+            autoCloseTimer = setTimeout(() => {
+                details.open = false;
+            }, 3000);
+        }
+
+        function clearAutoCloseTimer() {
+            clearTimeout(autoCloseTimer);
+        }
+
+        document.querySelectorAll('details.phone-dropdown').forEach(details => {
+            details.addEventListener('toggle', function() {
+                if (this.open) {
+                    document.querySelectorAll('details.phone-dropdown').forEach(other => {
+                        if (other !== this) other.open = false;
+                    });
+                    startAutoCloseTimer(this);
+                } else {
+                    clearAutoCloseTimer();
+                }
+            });
+        });
+
+        document.addEventListener('click', function(event) {
+            const isClickInside = event.target.closest('details.phone-dropdown');
+            if (!isClickInside) {
+                setTimeout(() => {
+                    document.querySelectorAll('details.phone-dropdown[open]').forEach(details => {
+                        details.open = false;
+                    });
+                }, 200);
+            } else {
+                const openDetails = document.querySelector('details.phone-dropdown[open]');
+                if (openDetails) {
+                    startAutoCloseTimer(openDetails);
+                }
+            }
+        });
+
+        function applyFilters() {
+            const session = document.getElementById('sessionFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            let url = new URL('{{ url("/admin/registrations") }}');
+            if (session) url.searchParams.set('session_id', session);
+            if (status) url.searchParams.set('status', status);
+            window.location.href = url.toString();
+        }
+    </script>
 @endsection
 

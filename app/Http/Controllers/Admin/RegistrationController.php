@@ -35,11 +35,23 @@ class RegistrationController extends Controller
             $query->where('status', $status);
         }
 
+        $sessionId = $request->query('session_id');
+        if ($sessionId) {
+            $query->where('event_session_id', $sessionId);
+        }
+
         $regs = $query->paginate(30)->withQueryString();
+
+        $sessions = EventSession::query()
+            ->with('venue')
+            ->orderBy('starts_at', 'desc')
+            ->get();
 
         return view('admin.registrations.index', [
             'registrations' => $regs,
             'statusFilter' => $status,
+            'sessionIdFilter' => $sessionId,
+            'sessions' => $sessions,
         ]);
     }
 
@@ -48,6 +60,16 @@ class RegistrationController extends Controller
         $query = Registration::query()
             ->with('eventSession.venue')
             ->orderBy('created_at');
+
+        $status = $request->query('status');
+        if ($status && in_array($status, ['confirmed', 'cancelled'])) {
+            $query->where('status', $status);
+        }
+
+        $sessionId = $request->query('session_id');
+        if ($sessionId) {
+            $query->where('event_session_id', $sessionId);
+        }
         $filename = 'registrations.csv';
 
         return response()->streamDownload(function () use ($query) {
@@ -130,6 +152,16 @@ class RegistrationController extends Controller
         $query = Registration::query()
             ->with('eventSession.venue')
             ->orderBy('created_at');
+
+        $status = $request->query('status');
+        if ($status && in_array($status, ['confirmed', 'cancelled'])) {
+            $query->where('status', $status);
+        }
+
+        $sessionId = $request->query('session_id');
+        if ($sessionId) {
+            $query->where('event_session_id', $sessionId);
+        }
 
         $filename = 'registrations.xls';
 
