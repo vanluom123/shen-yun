@@ -47,6 +47,10 @@ Route::middleware(['admin.authed'])->group(function () {
     Route::get('/admin/registrations', [RegistrationController::class, 'index']);
     Route::get('/admin/registrations/export.csv', [RegistrationController::class, 'exportCsv']);
     Route::get('/admin/registrations/export.xls', [RegistrationController::class, 'exportXls']);
+    Route::get('/admin/registrations/{registration}/edit', [RegistrationController::class, 'edit']);
+    Route::put('/admin/registrations/{registration}', [RegistrationController::class, 'update']);
+    Route::post('/admin/registrations/{registration}/cancel', [RegistrationController::class, 'cancel']);
+    Route::delete('/admin/registrations/{registration}', [RegistrationController::class, 'destroy']);
 
     Route::get('/admin/sessions', [EventSessionController::class, 'index']);
     Route::get('/admin/sessions/create', [EventSessionController::class, 'create']);

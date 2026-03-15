@@ -114,10 +114,13 @@ class RegistrationWizardController extends Controller
             ]);
         }
 
-        // Enforce capacity_total=36 and recompute reserved from registrations for both sessions.
+        // Enforce capacity_total=36 and recompute reserved from confirmed registrations for both sessions.
         foreach ([$baseSession, $nextSession] as $s) {
             EventSession::query()->whereKey($s->id)->update(['capacity_total' => 36]);
-            $reserved = (int) Registration::query()->where('event_session_id', $s->id)->sum('total_count');
+            $reserved = (int) Registration::query()
+                ->where('event_session_id', $s->id)
+                ->where('status', 'confirmed')
+                ->sum('total_count');
             EventSession::query()->whereKey($s->id)->update(['capacity_reserved' => $reserved]);
             $s->capacity_total = 36;
             $s->capacity_reserved = $reserved;
@@ -391,7 +394,7 @@ class RegistrationWizardController extends Controller
                 ->update(['capacity_reserved' => $newReserved]);
             $session->capacity_reserved = $newReserved;
 
-            return Registration::query()->create([
+            $registration = Registration::query()->create([
                 'event_session_id' => $session->id,
                 'full_name' => $draft['full_name'],
                 'email' => $draft['email'],
@@ -402,7 +405,6 @@ class RegistrationWizardController extends Controller
                 'child_count' => (int) $draft['child_count'],
                 'total_count' => (int) $draft['total_count'],
                 'attend_with_guest' => (bool) ($draft['attend_with_guest'] ?? false),
-                'status' => 'confirmed',
             ]);
         });
 

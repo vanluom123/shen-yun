@@ -31,4 +31,14 @@ class EventSession extends Model
     {
         return $this->hasMany(Registration::class);
     }
+
+    public static function recalculateReserved(int $sessionId): void
+    {
+        $reserved = Registration::query()
+            ->where('event_session_id', $sessionId)
+            ->where('status', 'confirmed')
+            ->sum('total_count');
+
+        self::query()->whereKey($sessionId)->update(['capacity_reserved' => $reserved]);
+    }
 }
