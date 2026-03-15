@@ -121,4 +121,20 @@ class EventSessionController extends Controller
 
         return redirect()->to('/admin/sessions')->with('status', $msg);
     }
+
+    /**
+     * Remove multiple sessions from storage.
+     */
+    public function destroyMultiple(Request $request)
+    {
+        $ids = $request->input('session_ids', []);
+
+        if (empty($ids)) {
+            return redirect()->to('/admin/sessions')->with('status', 'Vui lòng chọn ít nhất một suất diễn.');
+        }
+
+        $count = EventSession::query()->whereIn('id', $ids)->delete();
+
+        return redirect()->to('/admin/sessions')->with('status', "Đã xoá {$count} suất diễn.");
+    }
 }
