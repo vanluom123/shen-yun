@@ -137,10 +137,10 @@ class RegistrationWizardController extends Controller
 
         if (!$primarySession->is_registration_blocked) {
             $activeSession = $primarySession;
-        } elseif (!$fallbackSession->is_registration_blocked) {
+        } elseif (!$preferNext && !$fallbackSession->is_registration_blocked) {
             $activeSession = $fallbackSession;
         } else {
-            // Both weeks are blocked by admin – close all and signal unavailability.
+            // Both weeks are blocked by admin (or the valid week is blocked) – close all and signal unavailability.
             EventSession::query()->where('venue_id', $venueId)->update(['status' => 'inactive']);
             return null;
         }
