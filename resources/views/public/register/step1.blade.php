@@ -72,12 +72,12 @@
                             <div class="rsvp-card {{ $isSelected ? 'rsvp-card-selected' : '' }} {{ $isDisabled ? 'border-neutral-500/30 bg-black/10' : '' }}" data-session-card>
                                 <div class="text-base font-semibold text-[#f3e2b6]">{{ $dateLabel }}</div>
                                 <div class="mt-1 text-sm text-neutral-200/75">
-                                    @if ($isInactive && !$isPostponed)
-                                        Đã đóng
-                                    @elseif ($isPostponed)
+                                    @if ($isPostponed)
                                         Tạm hoãn
                                     @elseif ($isFullyBooked)
                                         Hết chỗ
+                                    @elseif ($isInactive)
+                                        Đã đóng
                                     @else
                                         còn {{ $remaining }} chỗ
                                     @endif

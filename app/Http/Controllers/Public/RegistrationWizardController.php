@@ -126,8 +126,8 @@ class RegistrationWizardController extends Controller
             $s->capacity_reserved = $reserved;
         }
 
-        // Determine which session should be active, respecting admin block flags.
-        // Primary: cutoff-based preference. Fallback: try the other week if primary is blocked.
+        // Determine which session should be active, respecting admin block flags and capacity.
+        // Primary: cutoff-based preference. Fallback: try the other week if primary is blocked or full.
         // If both are blocked, mark all inactive and return null (registration unavailable).
         $baseSession = $baseSession->fresh();
         $nextSession = $nextSession->fresh();
@@ -135,12 +135,22 @@ class RegistrationWizardController extends Controller
         $primarySession = $preferNext ? $nextSession : $baseSession;
         $fallbackSession = $preferNext ? $baseSession : $nextSession;
 
-        if (!$primarySession->is_registration_blocked) {
+        $primaryHasCapacity = $primarySession->capacity_reserved < $primarySession->capacity_total;
+        $fallbackHasCapacity = $fallbackSession->capacity_reserved < $fallbackSession->capacity_total;
+
+        if (!$primarySession->is_registration_blocked && $primaryHasCapacity) {
             $activeSession = $primarySession;
+        } elseif (!$preferNext && !$fallbackSession->is_registration_blocked && $fallbackHasCapacity) {
+            $activeSession = $fallbackSession;
         } elseif (!$preferNext && !$fallbackSession->is_registration_blocked) {
+            // Primary is full but fallback exists and is not blocked - check if we should activate fallback anyway
+            // This case handles when primary is full but fallback should still be available
+            $activeSession = $fallbackSession;
+        } elseif (!$primarySession->is_registration_blocked && !$primaryHasCapacity && !$fallbackSession->is_registration_blocked && $fallbackHasCapacity) {
+            // Primary is full, fallback has capacity and is not blocked
             $activeSession = $fallbackSession;
         } else {
-            // Both weeks are blocked by admin (or the valid week is blocked) – close all and signal unavailability.
+            // Both weeks are blocked by admin (or no sessions have capacity) – close all and signal unavailability.
             EventSession::query()->where('venue_id', $venueId)->update(['status' => 'inactive']);
             return null;
         }
