@@ -41,9 +41,9 @@
             @if ($sessions->isEmpty())
                 <div class="mt-3 rounded-2xl border border-neutral-500/30 bg-black/25 px-4 py-3 text-sm text-neutral-200/80">
                     @if (!empty($registrationBlocked))
-                        Suất diễn tuần này đang tạm hoãn nhận đăng ký. Vui lòng quay lại sau hoặc liên hệ ban tổ chức.
+                        Trình chiếu tuần này đang tạm hoãn nhận đăng ký. Vui lòng quay lại sau hoặc liên hệ ban tổ chức.
                     @else
-                        Chưa có suất diễn cho địa điểm này. Vui lòng chọn địa điểm khác hoặc liên hệ ban tổ chức.
+                        Chưa có trình chiếu cho địa điểm này. Vui lòng chọn địa điểm khác hoặc liên hệ ban tổ chức.
                     @endif
                 </div>
             @else

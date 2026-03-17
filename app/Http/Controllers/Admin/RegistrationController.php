@@ -104,7 +104,7 @@ class RegistrationController extends Controller
                     'Mã',
                     'Tạo lúc',
                     'Địa điểm',
-                    'Suất diễn',
+                    'Trình chiếu',
                     'Họ tên',
                     'Email',
                     'Phone',
@@ -182,7 +182,7 @@ class RegistrationController extends Controller
             fwrite($out, "<col style=\"width:60px\">");   // Mã
             fwrite($out, "<col style=\"width:120px\">");  // Tạo lúc
             fwrite($out, "<col style=\"width:160px\">");  // Địa điểm
-            fwrite($out, "<col style=\"width:140px\">");  // Suất diễn
+            fwrite($out, "<col style=\"width:140px\">");  // Trình chiếu
             fwrite($out, "<col style=\"width:180px\">");  // Họ tên
             fwrite($out, "<col style=\"width:240px\">");  // Email
             fwrite($out, "<col style=\"width:140px\">");  // Phone
@@ -200,7 +200,7 @@ class RegistrationController extends Controller
                 'Mã',
                 'Tạo lúc',
                 'Địa điểm',
-                'Suất diễn',
+                'Trình chiếu',
                 'Họ tên',
                 'Email',
                 'Phone',

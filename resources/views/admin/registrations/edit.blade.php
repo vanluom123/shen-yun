@@ -56,7 +56,7 @@
                 </div>
 
                 <div>
-                    <label class="text-sm font-medium" for="event_session_id">Suất diễn</label>
+                    <label class="text-sm font-medium" for="event_session_id">Trình chiếu</label>
                     <select
                         id="event_session_id"
                         name="event_session_id"
@@ -139,7 +139,7 @@
         @if($registration->status === 'confirmed')
             <div class="mt-8 border-t border-neutral-200 pt-6">
                 <h3 class="text-lg font-semibold">Hủy đăng ký</h3>
-                <p class="mt-1 text-sm text-neutral-600">Hủy đăng ký sẽ giải phóng chỗ cho suất diễn này.</p>
+                <p class="mt-1 text-sm text-neutral-600">Hủy đăng ký sẽ giải phóng chỗ cho trình chiếu này.</p>
                 <form method="post" action="{{ url('/admin/registrations/'.$registration->id.'/cancel') }}" class="mt-4">
                     @csrf
                     <button

@@ -35,10 +35,10 @@
                         class="w-auto min-w-[200px] appearance-none rounded-full border border-neutral-200 bg-white py-2 pl-9 pr-8 text-sm text-neutral-700 outline-none hover:bg-neutral-50 focus:border-neutral-300"
                         onchange="applyFilters()"
                     >
-                        <option value="">Suất diễn: Tất cả</option>
+                        <option value="">Trình chiếu: Tất cả</option>
                         @foreach($sessions as $session)
                             <option value="{{ $session->id }}" {{ $sessionIdFilter == $session->id ? 'selected' : '' }}>
-                                Suất diễn: {{ $session->starts_at->format('d/m/Y H:i') }}
+                                Trình chiếu: {{ $session->starts_at->format('d/m/Y H:i') }}
                             </option>
                         @endforeach
                     </select>
@@ -82,7 +82,7 @@
                         <th class="w-56">Người mời</th>
                         <th class="w-72">Gmail</th>
                         <th class="w-40">SĐT</th>
-                        <th class="w-36">Suất diễn</th>
+                        <th class="w-36">Trình chiếu</th>
                         <th class="w-24">Khách</th>
                         <th class="w-24">NTL</th>
                         <th class="w-28">NTL mới</th>

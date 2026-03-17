@@ -21,7 +21,7 @@
             <div class="mt-1 text-sm text-neutral-600">Sắp có: CRUD venues.</div>
         </div>
         <div class="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
-            <div class="text-sm font-semibold">Quản lý suất diễn</div>
+            <div class="text-sm font-semibold">Quản lý trình chiếu</div>
             <div class="mt-1 text-sm text-neutral-600">Sắp có: CRUD sessions + danh sách đăng ký.</div>
         </div>
     </div>

@@ -65,7 +65,7 @@ class EventSessionController extends Controller
 
         EventSession::query()->create($data);
 
-        return redirect()->to('/admin/sessions')->with('status', 'Đã tạo suất diễn.');
+        return redirect()->to('/admin/sessions')->with('status', 'Đã tạo trình chiếu.');
     }
 
     /**
@@ -104,7 +104,7 @@ class EventSessionController extends Controller
 
         $session->update($data);
 
-        return redirect()->to('/admin/sessions')->with('status', 'Đã cập nhật suất diễn.');
+        return redirect()->to('/admin/sessions')->with('status', 'Đã cập nhật trình chiếu.');
     }
 
     /**
@@ -114,7 +114,7 @@ class EventSessionController extends Controller
     {
         $session->delete();
 
-        return redirect()->to('/admin/sessions')->with('status', 'Đã xoá suất diễn.');
+        return redirect()->to('/admin/sessions')->with('status', 'Đã xoá trình chiếu.');
     }
 
     /**
@@ -125,11 +125,11 @@ class EventSessionController extends Controller
         $ids = $request->input('session_ids', []);
 
         if (empty($ids)) {
-            return redirect()->to('/admin/sessions')->with('status', 'Vui lòng chọn ít nhất một suất diễn.');
+            return redirect()->to('/admin/sessions')->with('status', 'Vui lòng chọn ít nhất một trình chiếu.');
         }
 
         $count = EventSession::query()->whereIn('id', $ids)->delete();
 
-        return redirect()->to('/admin/sessions')->with('status', "Đã xoá {$count} suất diễn.");
+        return redirect()->to('/admin/sessions')->with('status', "Đã xoá {$count} trình chiếu.");
     }
 }

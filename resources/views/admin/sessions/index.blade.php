@@ -1,10 +1,10 @@
-@extends('layouts.app', ['title' => 'Admin – Suất diễn'])
+@extends('layouts.app', ['title' => 'Admin – trình chiếu'])
 
 @section('content')
     <div class="flex items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-semibold tracking-tight">Suất diễn</h1>
-            <p class="mt-1 text-sm text-neutral-600">Quản lý danh sách suất diễn. Bật <span class="font-medium">Tạm hoãn</span> để ngừng nhận đăng ký tuần đó.</p>
+            <h1 class="text-2xl font-semibold tracking-tight">trình chiếu</h1>
+            <p class="mt-1 text-sm text-neutral-600">Quản lý danh sách trình chiếu. Bật <span class="font-medium">Tạm hoãn</span> để ngừng nhận đăng ký tuần đó.</p>
         </div>
 
         <div class="flex items-center gap-2">
@@ -21,7 +21,7 @@
                 href="{{ url('/admin/sessions/create') }}"
                 class="rounded-xl bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800"
             >
-                Thêm suất diễn
+                Thêm trình chiếu
             </a>
         </div>
     </div>
@@ -45,7 +45,7 @@
                         <th class="px-4 py-3 w-10">
                             <input type="checkbox" id="select-all" class="rounded border-neutral-300">
                         </th>
-                        <th class="px-4 py-3">Suất diễn</th>
+                        <th class="px-4 py-3">trình chiếu</th>
                         <th class="px-4 py-3">Capacity</th>
                         <th class="px-4 py-3">Trạng thái</th>
                         <th class="px-4 py-3"></th>
@@ -93,7 +93,7 @@
                                 >
                                     Sửa
                                 </a>
-                                <form method="post" action="{{ url('/admin/sessions/'.$s->id) }}" onsubmit="return confirm('Xoá suất diễn này?')">
+                                <form method="post" action="{{ url('/admin/sessions/'.$s->id) }}" onsubmit="return confirm('Xoá trình chiếu này?')">
                                     @csrf
                                     @method('DELETE')
                                     <button class="rounded-lg border border-rose-300 bg-white px-3 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-50">
@@ -105,7 +105,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td class="px-4 py-10 text-center text-neutral-600" colspan="5">Chưa có suất diễn.</td>
+                        <td class="px-4 py-10 text-center text-neutral-600" colspan="5">Chưa có trình chiếu.</td>
                     </tr>
                 @endforelse
             </tbody>
@@ -140,7 +140,7 @@
         function confirmBulkDelete() {
             const checkboxes = document.querySelectorAll('.session-checkbox:checked');
             const count = checkboxes.length;
-            if (confirm('Xoá ' + count + ' suất diễn đã chọn? Tất cả đăng ký liên quan cũng sẽ bị xoá.')) {
+            if (confirm('Xoá ' + count + ' trình chiếu đã chọn? Tất cả đăng ký liên quan cũng sẽ bị xoá.')) {
                 const form = document.getElementById('bulk-delete-form');
                 const inputsContainer = document.getElementById('bulk-delete-inputs');
                 inputsContainer.innerHTML = '';

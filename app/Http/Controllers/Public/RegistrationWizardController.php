@@ -241,14 +241,14 @@ class RegistrationWizardController extends Controller
 
         if (!$session) {
             throw ValidationException::withMessages([
-                'event_session_id' => 'Suất diễn không hợp lệ hoặc đang tạm hoãn.',
+                'event_session_id' => 'Trình chiếu không hợp lệ hoặc đang tạm hoãn.',
             ]);
         }
 
         $remaining = $session->capacity_total - $session->capacity_reserved;
         if ($remaining <= 0) {
             throw ValidationException::withMessages([
-                'event_session_id' => 'Suất diễn này đã hết chỗ.',
+                'event_session_id' => 'Trình chiếu này đã hết chỗ.',
             ]);
         }
 
@@ -390,7 +390,7 @@ class RegistrationWizardController extends Controller
 
             if (!$session->isOpen()) {
                 throw ValidationException::withMessages([
-                    'event_session_id' => 'Suất diễn đã đóng hoặc đang tạm hoãn.',
+                    'event_session_id' => 'Trình chiếu đã đóng hoặc đang tạm hoãn.',
                 ]);
             }
 
