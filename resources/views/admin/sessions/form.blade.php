@@ -47,15 +47,15 @@
         </div>
 
         <div>
-            <label class="text-sm font-medium" for="status">Status</label>
+            <label class="text-sm font-medium" for="registration_status">Trạng thái</label>
             <select
-                id="status"
-                name="status"
+                id="registration_status"
+                name="registration_status"
                 required
                 class="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900"
             >
-                @foreach (['active' => 'active', 'closed' => 'closed'] as $val => $label)
-                    <option value="{{ $val }}" {{ (string) old('status', $session?->status ?? 'active') === (string) $val ? 'selected' : '' }}>
+                @foreach (['open' => 'Hoạt động', 'paused' => 'Tạm hoãn', 'hidden' => 'Ẩn'] as $val => $label)
+                    <option value="{{ $val }}" {{ old('registration_status', $session?->registration_status ?? 'open') === $val ? 'selected' : '' }}>
                         {{ $label }}
                     </option>
                 @endforeach

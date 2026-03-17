@@ -58,7 +58,7 @@ class EventSessionController extends Controller
             'venue_id' => ['required', 'integer', 'in:'.implode(',', $venues)],
             'starts_at' => ['required', 'date'],
             'capacity_total' => ['required', 'integer', 'min:1', 'max:100000'],
-            'status' => ['required', 'string', 'max:32'],
+            'registration_status' => ['required', 'string', 'max:32'],
         ]);
 
         $data['capacity_reserved'] = 0;
@@ -99,7 +99,7 @@ class EventSessionController extends Controller
             'venue_id' => ['required', 'integer', 'in:'.implode(',', $venues)],
             'starts_at' => ['required', 'date'],
             'capacity_total' => ['required', 'integer', 'min:1', 'max:100000'],
-            'status' => ['required', 'string', 'max:32'],
+            'registration_status' => ['required', 'string', 'max:32'],
         ]);
 
         $session->update($data);
@@ -115,22 +115,6 @@ class EventSessionController extends Controller
         $session->delete();
 
         return redirect()->to('/admin/sessions')->with('status', 'Đã xoá suất diễn.');
-    }
-
-    /**
-     * Toggle the registration block flag for a session.
-     */
-    public function toggleBlock(EventSession $session)
-    {
-        $session->update([
-            'is_registration_blocked' => !$session->is_registration_blocked,
-        ]);
-
-        $msg = $session->is_registration_blocked
-            ? 'Đã tạm hoãn nhận đăng ký cho suất này.'
-            : 'Đã mở lại nhận đăng ký cho suất này.';
-
-        return redirect()->to('/admin/sessions')->with('status', $msg);
     }
 
     /**

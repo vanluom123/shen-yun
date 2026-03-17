@@ -13,14 +13,27 @@ class EventSession extends Model
         'starts_at',
         'capacity_total',
         'capacity_reserved',
-        'status',
-        'is_registration_blocked',
+        'registration_status',
     ];
 
     protected $casts = [
         'starts_at' => 'datetime',
-        'is_registration_blocked' => 'boolean',
     ];
+
+    public function isOpen(): bool
+    {
+        return $this->registration_status === 'open';
+    }
+
+    public function isPaused(): bool
+    {
+        return $this->registration_status === 'paused';
+    }
+
+    public function isHidden(): bool
+    {
+        return $this->registration_status === 'hidden';
+    }
 
     public function venue(): BelongsTo
     {

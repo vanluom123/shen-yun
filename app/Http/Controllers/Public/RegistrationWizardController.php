@@ -92,8 +92,7 @@ class RegistrationWizardController extends Controller
                 'starts_at' => $baseSunday->toDateTimeString(),
                 'capacity_total' => 36,
                 'capacity_reserved' => 0,
-                'status' => 'inactive',
-                'is_registration_blocked' => false,
+                'registration_status' => 'hidden',
             ]);
         }
 
@@ -109,8 +108,7 @@ class RegistrationWizardController extends Controller
                 'starts_at' => $nextSunday->toDateTimeString(),
                 'capacity_total' => 36,
                 'capacity_reserved' => 0,
-                'status' => 'inactive',
-                'is_registration_blocked' => false,
+                'registration_status' => 'hidden',
             ]);
         }
 
@@ -126,9 +124,9 @@ class RegistrationWizardController extends Controller
             $s->capacity_reserved = $reserved;
         }
 
-        // Determine which session should be active, respecting admin block flags and capacity.
-        // Primary: cutoff-based preference. Fallback: try the other week if primary is blocked or full.
-        // If both are blocked, mark all inactive and return null (registration unavailable).
+        // Determine which session should be active, respecting admin status and capacity.
+        // Primary: cutoff-based preference. Fallback: try the other week if primary is paused or full.
+        // If both are paused, mark all hidden and return null (registration unavailable).
         $baseSession = $baseSession->fresh();
         $nextSession = $nextSession->fresh();
 
@@ -138,25 +136,25 @@ class RegistrationWizardController extends Controller
         $primaryHasCapacity = $primarySession->capacity_reserved < $primarySession->capacity_total;
         $fallbackHasCapacity = $fallbackSession->capacity_reserved < $fallbackSession->capacity_total;
 
-        if (!$primarySession->is_registration_blocked && $primaryHasCapacity) {
+        if ($primarySession->isOpen() && $primaryHasCapacity) {
             $activeSession = $primarySession;
-        } elseif (!$preferNext && !$fallbackSession->is_registration_blocked && $fallbackHasCapacity) {
+        } elseif (!$preferNext && $fallbackSession->isOpen() && $fallbackHasCapacity) {
             $activeSession = $fallbackSession;
-        } elseif (!$preferNext && !$fallbackSession->is_registration_blocked) {
-            // Primary is full but fallback exists and is not blocked - check if we should activate fallback anyway
+        } elseif (!$preferNext && $fallbackSession->isOpen()) {
+            // Primary is full but fallback exists and is open - check if we should activate fallback anyway
             // This case handles when primary is full but fallback should still be available
             $activeSession = $fallbackSession;
-        } elseif (!$primarySession->is_registration_blocked && !$primaryHasCapacity && !$fallbackSession->is_registration_blocked && $fallbackHasCapacity) {
-            // Primary is full, fallback has capacity and is not blocked
+        } elseif ($primarySession->isOpen() && !$primaryHasCapacity && $fallbackSession->isOpen() && $fallbackHasCapacity) {
+            // Primary is full, fallback has capacity and is open
             $activeSession = $fallbackSession;
         } else {
-            // Both weeks are blocked by admin (or no sessions have capacity) – close all and signal unavailability.
-            EventSession::query()->where('venue_id', $venueId)->update(['status' => 'inactive']);
+            // Both weeks are paused by admin (or no sessions have capacity) – close all and signal unavailability.
+            EventSession::query()->where('venue_id', $venueId)->update(['registration_status' => 'hidden']);
             return null;
         }
 
-        EventSession::query()->where('venue_id', $venueId)->update(['status' => 'inactive']);
-        EventSession::query()->whereKey($activeSession->id)->update(['status' => 'active']);
+        EventSession::query()->where('venue_id', $venueId)->update(['registration_status' => 'hidden']);
+        EventSession::query()->whereKey($activeSession->id)->update(['registration_status' => 'open']);
 
         return $activeSession->fresh();
     }
@@ -212,7 +210,7 @@ class RegistrationWizardController extends Controller
                 ->orderBy('starts_at')
                 ->get();
 
-            $activeSessions = $sessions->where('status', 'active');
+            $activeSessions = $sessions->where('registration_status', 'open');
             if ($activeSessions->isEmpty() && $sessions->isNotEmpty()) {
                 $registrationBlocked = true;
             }
@@ -238,18 +236,12 @@ class RegistrationWizardController extends Controller
         $session = EventSession::query()
             ->where('id', $data['event_session_id'])
             ->where('venue_id', $data['venue_id'])
-            ->where('status', 'active')
+            ->where('registration_status', 'open')
             ->first();
 
         if (!$session) {
             throw ValidationException::withMessages([
-                'event_session_id' => 'Suất diễn không hợp lệ.',
-            ]);
-        }
-
-        if ($session->is_registration_blocked) {
-            throw ValidationException::withMessages([
-                'event_session_id' => 'Suất diễn này đang tạm hoãn nhận đăng ký.',
+                'event_session_id' => 'Suất diễn không hợp lệ hoặc đang tạm hoãn.',
             ]);
         }
 
@@ -396,15 +388,9 @@ class RegistrationWizardController extends Controller
 
             $total = (int) $draft['total_count'];
 
-            if ($session->status !== 'active') {
+            if (!$session->isOpen()) {
                 throw ValidationException::withMessages([
-                    'event_session_id' => 'Suất diễn đã đóng.',
-                ]);
-            }
-
-            if ($session->is_registration_blocked) {
-                throw ValidationException::withMessages([
-                    'event_session_id' => 'Suất diễn này đang tạm hoãn nhận đăng ký.',
+                    'event_session_id' => 'Suất diễn đã đóng hoặc đang tạm hoãn.',
                 ]);
             }
 

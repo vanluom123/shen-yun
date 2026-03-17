@@ -59,5 +59,4 @@ Route::middleware(['admin.authed'])->group(function () {
     Route::get('/admin/sessions/{session}/edit', [EventSessionController::class, 'edit']);
     Route::put('/admin/sessions/{session}', [EventSessionController::class, 'update']);
     Route::delete('/admin/sessions/{session}', [EventSessionController::class, 'destroy']);
-    Route::post('/admin/sessions/{session}/toggle-block', [EventSessionController::class, 'toggleBlock']);
 });

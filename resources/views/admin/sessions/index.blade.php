@@ -48,7 +48,6 @@
                         <th class="px-4 py-3">Suất diễn</th>
                         <th class="px-4 py-3">Capacity</th>
                         <th class="px-4 py-3">Trạng thái</th>
-                        <th class="px-4 py-3">Nhận đăng ký</th>
                         <th class="px-4 py-3"></th>
                     </tr>
                 </thead>
@@ -56,8 +55,20 @@
                 @forelse ($sessions as $s)
                     @php
                         $remaining = max(0, $s->capacity_total - $s->capacity_reserved);
+                        $statusColors = [
+                            'open' => 'bg-emerald-100 text-emerald-800',
+                            'paused' => 'bg-amber-100 text-amber-800',
+                            'hidden' => 'bg-neutral-100 text-neutral-600',
+                        ];
+                        $statusLabels = [
+                            'open' => 'Hoạt động',
+                            'paused' => 'Tạm hoãn',
+                            'hidden' => 'Ẩn',
+                        ];
+                        $color = $statusColors[$s->registration_status] ?? 'bg-neutral-100 text-neutral-800';
+                        $label = $statusLabels[$s->registration_status] ?? $s->registration_status;
                     @endphp
-                        <tr class="{{ $s->is_registration_blocked ? 'bg-amber-50' : '' }}">
+                        <tr class="{{ $s->isHidden() ? 'bg-neutral-50 opacity-60' : '' }}">
                             <td class="px-4 py-3">
                                 <input type="checkbox" name="session_ids[]" value="{{ $s->id }}" class="session-checkbox rounded border-neutral-300">
                             </td>
@@ -70,45 +81,12 @@
                             <div class="text-xs text-neutral-500">Còn {{ $remaining }}</div>
                         </td>
                         <td class="px-4 py-3">
-                            <span class="inline-flex rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-800">
-                                {{ $s->status }}
+                            <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {{ $color }}">
+                                {{ $label }}
                             </span>
                         </td>
                         <td class="px-4 py-3">
-                            @if ($s->is_registration_blocked)
-                                <span class="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
-                                    <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524L13.477 14.89zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd"/></svg>
-                                    Tạm hoãn
-                                </span>
-                            @else
-                                <span class="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800">
-                                    <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-                                    Đang mở
-                                </span>
-                            @endif
-                        </td>
-                        <td class="px-4 py-3">
                             <div class="flex items-center justify-end gap-2">
-                                <form method="post" action="{{ url('/admin/sessions/'.$s->id.'/toggle-block') }}">
-                                    @csrf
-                                    @if ($s->is_registration_blocked)
-                                        <button
-                                            class="rounded-lg border border-emerald-300 bg-white px-3 py-1.5 text-xs font-medium text-emerald-700 hover:bg-emerald-50"
-                                            title="Mở lại nhận đăng ký"
-                                        >
-                                            Mở lại
-                                        </button>
-                                    @else
-                                        <button
-                                            class="rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-medium text-amber-700 hover:bg-amber-50"
-                                            onclick="return confirm('Tạm hoãn nhận đăng ký cho suất này?')"
-                                            title="Tạm hoãn nhận đăng ký"
-                                        >
-                                            Tạm hoãn
-                                        </button>
-                                    @endif
-                                </form>
-
                                 <a
                                     href="{{ url('/admin/sessions/'.$s->id.'/edit') }}"
                                     class="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium hover:bg-neutral-50"
@@ -127,7 +105,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td class="px-4 py-10 text-center text-neutral-600" colspan="6">Chưa có suất diễn.</td>
+                        <td class="px-4 py-10 text-center text-neutral-600" colspan="5">Chưa có suất diễn.</td>
                     </tr>
                 @endforelse
             </tbody>
