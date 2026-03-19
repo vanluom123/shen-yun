@@ -16,10 +16,10 @@
     </div>
 
     <div class="mt-6 grid gap-4 sm:grid-cols-2">
-        <div class="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
+        <a href="{{ url('/admin/venues') }}" class="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm hover:border-neutral-400">
             <div class="text-sm font-semibold">Quản lý địa điểm</div>
-            <div class="mt-1 text-sm text-neutral-600">Sắp có: CRUD venues.</div>
-        </div>
+            <div class="mt-1 text-sm text-neutral-600">Thêm, sửa, xóa địa điểm tổ chức.</div>
+        </a>
         <div class="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm">
             <div class="text-sm font-semibold">Quản lý trình chiếu</div>
             <div class="mt-1 text-sm text-neutral-600">Sắp có: CRUD sessions + danh sách đăng ký.</div>

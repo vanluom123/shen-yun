@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\EventSessionController;
 use App\Http\Controllers\Admin\RegistrationController;
 use App\Http\Controllers\Admin\SessionTemplateController;
+use App\Http\Controllers\Admin\VenueController;
 use App\Http\Controllers\Public\RegisterAccessController;
 use App\Http\Controllers\Public\RegistrationWizardController;
 use Illuminate\Support\Facades\Route;
@@ -61,6 +62,13 @@ Route::middleware(['admin.authed'])->group(function () {
     Route::get('/admin/sessions/{session}/edit', [EventSessionController::class, 'edit']);
     Route::put('/admin/sessions/{session}', [EventSessionController::class, 'update']);
     Route::delete('/admin/sessions/{session}', [EventSessionController::class, 'destroy']);
+
+    Route::get('/admin/venues', [VenueController::class, 'index']);
+    Route::get('/admin/venues/create', [VenueController::class, 'create']);
+    Route::post('/admin/venues', [VenueController::class, 'store']);
+    Route::get('/admin/venues/{venue}/edit', [VenueController::class, 'edit']);
+    Route::put('/admin/venues/{venue}', [VenueController::class, 'update']);
+    Route::delete('/admin/venues/{venue}', [VenueController::class, 'destroy']);
 
     Route::get('/admin/templates', [SessionTemplateController::class, 'index']);
     Route::get('/admin/templates/create', [SessionTemplateController::class, 'create']);
