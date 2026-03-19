@@ -17,6 +17,16 @@
                 Xoá đã chọn
             </button>
 
+            <form method="post" action="{{ url('/admin/sessions/generate') }}" class="inline">
+                @csrf
+                <button
+                    type="submit"
+                    class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                >
+                    Tạo trình chiếu
+                </button>
+            </form>
+
             <a
                 href="{{ url('/admin/sessions/create') }}"
                 class="rounded-xl bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800"

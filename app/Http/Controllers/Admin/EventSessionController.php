@@ -132,4 +132,19 @@ class EventSessionController extends Controller
 
         return redirect()->to('/admin/sessions')->with('status', "Đã xoá {$count} trình chiếu.");
     }
+
+    /**
+     * Manually trigger session generation for all venues with templates.
+     */
+    public function generate(Request $request)
+    {
+        $generatorService = app(\App\Services\SessionGeneratorService::class);
+        $count = $generatorService->generateForAllVenues();
+        
+        $message = $count > 0 
+            ? "Đã tạo {$count} trình chiếu."
+            : "Không có trình chiếu mới cần tạo.";
+        
+        return redirect()->to('/admin/sessions')->with('status', $message);
+    }
 }

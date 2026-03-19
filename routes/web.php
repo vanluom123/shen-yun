@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Admin\EventSessionController;
 use App\Http\Controllers\Admin\RegistrationController;
+use App\Http\Controllers\Admin\SessionTemplateController;
 use App\Http\Controllers\Public\RegisterAccessController;
 use App\Http\Controllers\Public\RegistrationWizardController;
 use Illuminate\Support\Facades\Route;
@@ -55,8 +56,16 @@ Route::middleware(['admin.authed'])->group(function () {
     Route::get('/admin/sessions', [EventSessionController::class, 'index']);
     Route::get('/admin/sessions/create', [EventSessionController::class, 'create']);
     Route::post('/admin/sessions', [EventSessionController::class, 'store']);
+    Route::post('/admin/sessions/generate', [EventSessionController::class, 'generate']);
     Route::delete('/admin/sessions/bulk-destroy', [EventSessionController::class, 'destroyMultiple']);
     Route::get('/admin/sessions/{session}/edit', [EventSessionController::class, 'edit']);
     Route::put('/admin/sessions/{session}', [EventSessionController::class, 'update']);
     Route::delete('/admin/sessions/{session}', [EventSessionController::class, 'destroy']);
+
+    Route::get('/admin/templates', [SessionTemplateController::class, 'index']);
+    Route::get('/admin/templates/create', [SessionTemplateController::class, 'create']);
+    Route::post('/admin/templates', [SessionTemplateController::class, 'store']);
+    Route::get('/admin/templates/{template}/edit', [SessionTemplateController::class, 'edit']);
+    Route::put('/admin/templates/{template}', [SessionTemplateController::class, 'update']);
+    Route::delete('/admin/templates/{template}', [SessionTemplateController::class, 'destroy']);
 });
