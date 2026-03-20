@@ -51,17 +51,17 @@
         <body class="min-h-dvh bg-transparent text-neutral-900">
             <div class="min-h-dvh flex flex-col">
                 <header class="border-b border-white/20 bg-white/70 backdrop-blur-md">
-                    <div class="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-3">
-                        <a href="{{ url('/') }}" class="font-semibold tracking-tight">
+                    <div class="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:py-4">
+                        <a href="{{ url('/') }}" class="font-semibold tracking-tight text-lg">
                             {{ $appTitle }}
                         </a>
 
-                        <nav class="flex items-center gap-2 text-sm">
+                        <nav class="flex items-center gap-1 sm:gap-2 text-sm">
                             @if (session('admin_authed'))
                                 @include('admin.partials.nav')
                                 <form method="post" action="{{ url('/admin/logout') }}">
                                     @csrf
-                                    <button class="rounded-md px-3 py-1.5 hover:bg-black/5">Đăng xuất</button>
+                                    <button class="rounded-md px-2 py-1.5 hover:bg-black/5 whitespace-nowrap sm:px-3">Đăng xuất</button>
                                 </form>
                             @else
                                 <a

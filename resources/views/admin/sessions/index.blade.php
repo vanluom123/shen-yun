@@ -1,17 +1,17 @@
 @extends('layouts.app', ['title' => 'Admin – trình chiếu'])
 
 @section('content')
-    <div class="flex items-center justify-between gap-4">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
             <h1 class="text-2xl font-semibold tracking-tight">trình chiếu</h1>
             <p class="mt-1 text-sm text-neutral-600">Quản lý danh sách trình chiếu. Bật <span class="font-medium">Tạm hoãn</span> để ngừng nhận đăng ký tuần đó.</p>
         </div>
 
-        <div class="flex items-center gap-2">
+        <div class="flex flex-wrap items-center gap-2">
             <button
                 type="button"
                 id="delete-selected"
-                class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 hidden"
+                class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 hidden whitespace-nowrap"
                 onclick="confirmBulkDelete()"
             >
                 Xoá đã chọn
@@ -21,7 +21,7 @@
                 @csrf
                 <button
                     type="submit"
-                    class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+                    class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 whitespace-nowrap"
                 >
                     Tạo trình chiếu
                 </button>
@@ -29,7 +29,7 @@
 
             <a
                 href="{{ url('/admin/sessions/create') }}"
-                class="rounded-xl bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800"
+                class="rounded-xl bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 whitespace-nowrap"
             >
                 Thêm trình chiếu
             </a>
@@ -48,8 +48,8 @@
         <div id="bulk-delete-inputs"></div>
     </form>
 
-    <div class="mt-6 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-        <table class="w-full text-sm">
+    <div class="mt-6 overflow-x-auto rounded-2xl border border-neutral-200 bg-white shadow-sm">
+        <table class="w-full min-w-[640px] text-sm">
             <thead class="bg-neutral-50 text-left text-xs font-semibold text-neutral-600">
                     <tr>
                         <th class="px-4 py-3 w-10">
@@ -123,7 +123,66 @@
     </div>
 
     <div class="mt-4">
-        {{ $sessions->links() }}
+        {{ $sessions->appends(['sessions_page' => $sessions->currentPage()])->links() }}
+    </div>
+
+    <div class="mt-12">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="text-xl font-semibold tracking-tight">Mẫu lịch chiếu</h2>
+                <p class="mt-1 text-sm text-neutral-600">Lịch chiếu mẫu hàng tuần cho từng địa điểm. Hệ thống sử dụng mẫu này để tự động tạo trình chiếu mới.</p>
+            </div>
+
+            <a
+                href="{{ url('/admin/templates/create') }}"
+                class="rounded-xl bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 whitespace-nowrap"
+            >
+                Thêm mẫu lịch
+            </a>
+        </div>
+
+        <div class="mt-6 overflow-x-auto rounded-2xl border border-neutral-200 bg-white shadow-sm">
+            <table class="w-full min-w-[640px] text-sm">
+                <thead class="bg-neutral-50 text-left text-xs font-semibold text-neutral-600">
+                    <tr>
+                        <th class="px-4 py-3">Địa điểm</th>
+                        <th class="px-4 py-3">Số khung giờ</th>
+                        <th class="px-4 py-3"></th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-neutral-200">
+                    @forelse ($templates as $template)
+                        <tr>
+                            <td class="px-4 py-3 font-medium">{{ $template->venue->name }}</td>
+                            <td class="px-4 py-3 text-neutral-700">
+                                {{ $template->slots->count() }} khung giờ
+                            </td>
+                            <td class="px-4 py-3">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a
+                                        href="{{ url('/admin/templates/'.$template->id.'/edit') }}"
+                                        class="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium hover:bg-neutral-50"
+                                    >
+                                        Sửa
+                                    </a>
+                                    <form method="post" action="{{ url('/admin/templates/'.$template->id) }}" onsubmit="return confirm('Xoá mẫu lịch chiếu này?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="rounded-lg border border-rose-300 bg-white px-3 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-50">
+                                            Xoá
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td class="px-4 py-10 text-center text-neutral-600" colspan="3">Chưa có mẫu lịch chiếu.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>

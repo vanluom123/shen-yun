@@ -7,7 +7,7 @@
                 <h1 class="text-2xl font-semibold tracking-tight">Thêm mẫu lịch chiếu</h1>
                 <p class="mt-1 text-sm text-neutral-600">Tạo mẫu lịch chiếu mới cho địa điểm.</p>
             </div>
-            <a href="{{ url('/admin/templates') }}" class="rounded-xl border border-neutral-300 bg-white px-4 py-2 text-sm font-medium hover:bg-neutral-50">
+            <a href="{{ url('/admin/sessions') }}" class="rounded-xl border border-neutral-300 bg-white px-4 py-2 text-sm font-medium hover:bg-neutral-50">
                 Quay lại
             </a>
         </div>

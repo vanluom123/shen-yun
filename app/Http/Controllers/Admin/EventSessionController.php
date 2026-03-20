@@ -18,10 +18,16 @@ class EventSessionController extends Controller
         $sessions = EventSession::query()
             ->with('venue')
             ->orderByDesc('starts_at')
-            ->paginate(20);
+            ->paginate(20, ['*'], 'sessions_page');
+
+        $templates = \App\Models\SessionTemplate::query()
+            ->with(['venue', 'slots'])
+            ->orderBy('id')
+            ->get();
 
         return view('admin.sessions.index', [
             'sessions' => $sessions,
+            'templates' => $templates,
         ]);
     }
 

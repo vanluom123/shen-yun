@@ -55,7 +55,7 @@ class SessionTemplateControllerTest extends TestCase
                 ],
             ]);
 
-        $response->assertRedirect('/admin/templates');
+        $response->assertRedirect('/admin/sessions');
         $response->assertSessionHas('status', 'Đã tạo mẫu lịch chiếu.');
 
         $this->assertDatabaseHas('session_templates', [
@@ -226,7 +226,7 @@ class SessionTemplateControllerTest extends TestCase
             ],
         ]);
 
-        $response->assertRedirect('/admin/templates');
+        $response->assertRedirect('/admin/sessions');
         $response->assertSessionHas('status', 'Đã cập nhật mẫu lịch chiếu.');
 
         // Verify old slots are deleted
@@ -375,7 +375,7 @@ class SessionTemplateControllerTest extends TestCase
 
         $response = $this->delete("/admin/templates/{$template->id}");
 
-        $response->assertRedirect('/admin/templates');
+        $response->assertRedirect('/admin/sessions');
         $response->assertSessionHas('status', 'Đã xóa mẫu lịch chiếu.');
 
         // Verify template is deleted
@@ -414,7 +414,7 @@ class SessionTemplateControllerTest extends TestCase
         // Delete the template
         $response = $this->delete("/admin/templates/{$template->id}");
 
-        $response->assertRedirect('/admin/templates');
+        $response->assertRedirect('/admin/sessions');
 
         // Verify template is deleted
         $this->assertDatabaseMissing('session_templates', [

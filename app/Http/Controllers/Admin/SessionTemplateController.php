@@ -74,7 +74,7 @@ class SessionTemplateController extends Controller
             }
         });
 
-        return redirect()->to('/admin/templates')->with('status', 'Đã tạo mẫu lịch chiếu.');
+        return redirect()->to('/admin/sessions')->with('status', 'Đã tạo mẫu lịch chiếu.');
     }
 
     /**
@@ -132,7 +132,7 @@ class SessionTemplateController extends Controller
             }
         });
 
-        return redirect()->to('/admin/templates')->with('status', 'Đã cập nhật mẫu lịch chiếu.');
+        return redirect()->to('/admin/sessions')->with('status', 'Đã cập nhật mẫu lịch chiếu.');
     }
 
     /**
@@ -143,7 +143,7 @@ class SessionTemplateController extends Controller
         // Delete the template (cascade delete will remove associated slots via foreign key)
         $template->delete();
 
-        return redirect()->to('/admin/templates')->with('status', 'Đã xóa mẫu lịch chiếu.');
+        return redirect()->to('/admin/sessions')->with('status', 'Đã xóa mẫu lịch chiếu.');
     }
 
 }
