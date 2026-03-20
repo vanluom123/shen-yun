@@ -1,65 +1,88 @@
-@extends('layouts.app', ['title' => 'Admin – Địa điểm'])
+@extends('layouts.app', ['title' => 'Địa điểm'])
 
 @section('content')
-    <div class="flex items-center justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-semibold tracking-tight">Địa điểm</h1>
-            <p class="mt-1 text-sm text-neutral-600">Quản lý danh sách địa điểm.</p>
+    <div class="space-y-10">
+        <!-- Section Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold tracking-tight text-on-surface mb-2">Địa điểm</h1>
+                <p class="text-on-surface-variant max-w-md">Danh sách các địa điểm tổ chức sự kiện. Bạn có thể cài đặt múi giờ và địa chỉ cho từng địa điểm.</p>
+            </div>
+
+            <a
+                href="{{ url('/admin/venues/create') }}"
+                class="btn-admin-primary px-8"
+            >
+                <span class="material-symbols-outlined text-sm">add</span>
+                Thêm địa điểm
+            </a>
         </div>
 
-        <a
-            href="{{ url('/admin/venues/create') }}"
-            class="rounded-xl bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800"
-        >
-            Thêm địa điểm
-        </a>
-    </div>
+        <!-- Venues Table Card -->
+        <div class="admin-card">
+            <div class="overflow-x-auto">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Tên địa điểm</th>
+                            <th>Địa chỉ</th>
+                            <th>Múi giờ</th>
+                            <th class="text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y-0">
+                        @forelse ($venues as $v)
+                            <tr class="group">
+                                <td>
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-primary/5 flex items-center justify-center text-primary">
+                                            <span class="material-symbols-outlined text-xl">location_on</span>
+                                        </div>
+                                        <span class="font-bold text-on-surface">{{ $v->name }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="text-sm text-on-surface-variant">{{ $v->address ?? '—' }}</span>
+                                </td>
+                                <td>
+                                    <span class="px-3 py-1 bg-surface-container rounded-full text-xs font-medium text-on-surface-variant">
+                                        {{ $v->timezone }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <a
+                                            href="{{ url('/admin/venues/'.$v->id.'/edit') }}"
+                                            class="p-2 hover:bg-primary/10 text-primary rounded-lg transition-colors"
+                                            title="Sửa"
+                                        >
+                                            <span class="material-symbols-outlined text-lg">edit</span>
+                                        </a>
+                                        <form method="post" action="{{ url('/admin/venues/'.$v->id) }}" onsubmit="return confirm('Xoá địa điểm này?')" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="p-2 hover:bg-error/10 text-error rounded-lg transition-colors" title="Xoá">
+                                                <span class="material-symbols-outlined text-lg">delete</span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+@empty
+                            <tr>
+                                <td class="py-10 text-center text-on-surface-variant" colspan="4">Chưa có địa điểm.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-    <div class="mt-6 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
-        <table class="w-full text-sm">
-            <thead class="bg-neutral-50 text-left text-xs font-semibold text-neutral-600">
-                <tr>
-                    <th class="px-4 py-3">Tên</th>
-                    <th class="px-4 py-3">Địa chỉ</th>
-                    <th class="px-4 py-3">Timezone</th>
-                    <th class="px-4 py-3"></th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-neutral-200">
-                @forelse ($venues as $v)
-                    <tr>
-                        <td class="px-4 py-3 font-medium">{{ $v->name }}</td>
-                        <td class="px-4 py-3 text-neutral-700">{{ $v->address ?? '—' }}</td>
-                        <td class="px-4 py-3 text-neutral-700">{{ $v->timezone }}</td>
-                        <td class="px-4 py-3">
-                            <div class="flex items-center justify-end gap-2">
-                                <a
-                                    href="{{ url('/admin/venues/'.$v->id.'/edit') }}"
-                                    class="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium hover:bg-neutral-50"
-                                >
-                                    Sửa
-                                </a>
-                                <form method="post" action="{{ url('/admin/venues/'.$v->id) }}" onsubmit="return confirm('Xoá địa điểm này?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="rounded-lg border border-rose-300 bg-white px-3 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-50">
-                                        Xoá
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td class="px-4 py-10 text-center text-neutral-600" colspan="4">Chưa có địa điểm.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    <div class="mt-4">
-        {{ $venues->links() }}
+        @if($venues->hasPages())
+            <div class="mt-4">
+                {{ $venues->links() }}
+            </div>
+        @endif
     </div>
 @endsection
 

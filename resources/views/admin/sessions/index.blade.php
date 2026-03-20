@@ -1,187 +1,202 @@
-@extends('layouts.app', ['title' => 'Admin – trình chiếu'])
+@extends('layouts.app', ['title' => 'Trình chiếu'])
 
 @section('content')
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-            <h1 class="text-2xl font-semibold tracking-tight">trình chiếu</h1>
-            <p class="mt-1 text-sm text-neutral-600">Quản lý danh sách trình chiếu. Bật <span class="font-medium">Tạm hoãn</span> để ngừng nhận đăng ký tuần đó.</p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2">
-            <button
-                type="button"
-                id="delete-selected"
-                class="rounded-xl bg-rose-600 px-4 py-2 text-sm font-medium text-white hover:bg-rose-700 hidden whitespace-nowrap"
-                onclick="confirmBulkDelete()"
-            >
-                Xoá đã chọn
-            </button>
-
-            <form method="post" action="{{ url('/admin/sessions/generate') }}" class="inline">
-                @csrf
-                <button
-                    type="submit"
-                    class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 whitespace-nowrap"
-                >
-                    Tạo trình chiếu
-                </button>
-            </form>
-
-            <a
-                href="{{ url('/admin/sessions/create') }}"
-                class="rounded-xl bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 whitespace-nowrap"
-            >
-                Thêm trình chiếu
-            </a>
-        </div>
-    </div>
-
-    @if (session('status'))
-        <div class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-            {{ session('status') }}
-        </div>
-    @endif
-
-    <form method="post" id="bulk-delete-form" action="{{ url('/admin/sessions/bulk-destroy') }}" class="hidden">
-        @csrf
-        @method('DELETE')
-        <div id="bulk-delete-inputs"></div>
-    </form>
-
-    <div class="mt-6 overflow-x-auto rounded-2xl border border-neutral-200 bg-white shadow-sm">
-        <table class="w-full min-w-[640px] text-sm">
-            <thead class="bg-neutral-50 text-left text-xs font-semibold text-neutral-600">
-                    <tr>
-                        <th class="px-4 py-3 w-10">
-                            <input type="checkbox" id="select-all" class="rounded border-neutral-300">
-                        </th>
-                        <th class="px-4 py-3">trình chiếu</th>
-                        <th class="px-4 py-3">Capacity</th>
-                        <th class="px-4 py-3">Trạng thái</th>
-                        <th class="px-4 py-3"></th>
-                    </tr>
-                </thead>
-            <tbody class="divide-y divide-neutral-200">
-                @forelse ($sessions as $s)
-                    @php
-                        $remaining = max(0, $s->capacity_total - $s->capacity_reserved);
-                        $statusColors = [
-                            'open' => 'bg-emerald-100 text-emerald-800',
-                            'paused' => 'bg-amber-100 text-amber-800',
-                            'hidden' => 'bg-neutral-100 text-neutral-600',
-                        ];
-                        $statusLabels = [
-                            'open' => 'Hoạt động',
-                            'paused' => 'Tạm hoãn',
-                            'hidden' => 'Ẩn',
-                        ];
-                        $color = $statusColors[$s->registration_status] ?? 'bg-neutral-100 text-neutral-800';
-                        $label = $statusLabels[$s->registration_status] ?? $s->registration_status;
-                    @endphp
-                        <tr class="{{ $s->isHidden() ? 'bg-neutral-50 opacity-60' : '' }}">
-                            <td class="px-4 py-3">
-                                <input type="checkbox" name="session_ids[]" value="{{ $s->id }}" class="session-checkbox rounded border-neutral-300">
-                            </td>
-                            <td class="px-4 py-3">
-                            <div class="font-medium">{{ $s->venue->name }}</div>
-                            <div class="text-xs text-neutral-600">{{ $s->starts_at->format('d/m/Y H:i') }}</div>
-                        </td>
-                        <td class="px-4 py-3 text-neutral-700">
-                            {{ $s->capacity_reserved }} / {{ $s->capacity_total }}
-                            <div class="text-xs text-neutral-500">Còn {{ $remaining }}</div>
-                        </td>
-                        <td class="px-4 py-3">
-                            <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-medium {{ $color }}">
-                                {{ $label }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3">
-                            <div class="flex items-center justify-end gap-2">
-                                <a
-                                    href="{{ url('/admin/sessions/'.$s->id.'/edit') }}"
-                                    class="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium hover:bg-neutral-50"
-                                >
-                                    Sửa
-                                </a>
-                                <form method="post" action="{{ url('/admin/sessions/'.$s->id) }}" onsubmit="return confirm('Xoá trình chiếu này?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="rounded-lg border border-rose-300 bg-white px-3 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-50">
-                                        Xoá
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td class="px-4 py-10 text-center text-neutral-600" colspan="5">Chưa có trình chiếu.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    <div class="mt-4">
-        {{ $sessions->appends(['sessions_page' => $sessions->currentPage()])->links() }}
-    </div>
-
-    <div class="mt-12">
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div class="space-y-10">
+        <!-- Section Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-                <h2 class="text-xl font-semibold tracking-tight">Mẫu lịch chiếu</h2>
-                <p class="mt-1 text-sm text-neutral-600">Lịch chiếu mẫu hàng tuần cho từng địa điểm. Hệ thống sử dụng mẫu này để tự động tạo trình chiếu mới.</p>
+                <h1 class="text-3xl font-extrabold tracking-tight text-on-surface mb-2">Trình chiếu</h1>
+                <p class="text-on-surface-variant max-w-md">Quản lý và theo dõi các chương trình trình chiếu tại các điểm sự kiện. Bật <span class="font-medium text-amber-600">Tạm hoãn</span> để ngừng nhận đăng ký.</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+                <button
+                    type="button"
+                    id="delete-selected"
+                    class="px-6 py-2.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-full text-sm font-bold active:scale-95 transition-all hidden items-center gap-2"
+                    onclick="confirmBulkDelete()"
+                >
+                    <span class="material-symbols-outlined text-sm">delete_sweep</span>
+                    Xoá đã chọn
+                </button>
+
+                <a
+                    href="{{ url('/admin/sessions/create') }}"
+                    class="btn-admin-secondary"
+                >
+                    <span class="material-symbols-outlined text-sm">add</span>
+                    Thêm trình chiếu
+                </a>
+
+                <form method="post" action="{{ url('/admin/sessions/generate') }}" class="inline">
+                    @csrf
+                    <button type="submit" class="btn-admin-primary">
+                        <span class="material-symbols-outlined text-sm">auto_videocam</span>
+                        Tạo trình chiếu
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <form method="post" id="bulk-delete-form" action="{{ url('/admin/sessions/bulk-destroy') }}" class="hidden">
+            @csrf
+            @method('DELETE')
+            <div id="bulk-delete-inputs"></div>
+        </form>
+
+        <!-- Sessions Table Card -->
+        <div class="admin-card">
+            <div class="overflow-x-auto">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th class="w-12 text-center">
+                                <input type="checkbox" id="select-all" class="rounded-sm border-outline-variant text-primary focus:ring-primary/40">
+                            </th>
+                            <th>trình chiếu</th>
+                            <th>Capacity</th>
+                            <th>Trạng thái</th>
+                            <th class="text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y-0">
+                        @forelse ($sessions as $s)
+                            @php
+                                $remaining = max(0, $s->capacity_total - $s->capacity_reserved);
+                                $statusStyles = [
+                                    'open' => 'bg-emerald-100 text-emerald-700',
+                                    'paused' => 'bg-amber-100 text-amber-700',
+                                    'hidden' => 'bg-neutral-100 text-neutral-600',
+                                ];
+                                $statusDots = [
+                                    'open' => 'bg-emerald-500',
+                                    'paused' => 'bg-amber-500',
+                                    'hidden' => 'bg-neutral-400',
+                                ];
+                                $statusLabels = [
+                                    'open' => 'Hoạt động',
+                                    'paused' => 'Tạm hoãn',
+                                    'hidden' => 'Ẩn',
+                                ];
+                                $style = $statusStyles[$s->registration_status] ?? 'bg-neutral-100 text-neutral-800';
+                                $dot = $statusDots[$s->registration_status] ?? 'bg-neutral-400';
+                                $label = $statusLabels[$s->registration_status] ?? $s->registration_status;
+                            @endphp
+                            <tr class="group {{ $s->isHidden() ? 'opacity-60 saturate-0' : '' }}">
+                                <td class="text-center">
+                                    <input type="checkbox" name="session_ids[]" value="{{ $s->id }}" class="session-checkbox rounded-sm border-outline-variant text-primary focus:ring-primary/40">
+                                </td>
+                                <td>
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-on-surface">{{ $s->venue->name }}</span>
+                                        <span class="text-xs text-on-surface-variant">{{ $s->starts_at->format('d/m/Y • H:i') }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-sm font-medium">{{ $s->capacity_reserved }} / {{ $s->capacity_total }}</span>
+                                        <span class="text-xs px-2 py-0.5 bg-surface-container rounded-full text-on-surface-variant">Còn {{ $remaining }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge-status {{ $style }}">
+                                        <span class="w-1.5 h-1.5 rounded-full {{ $dot }} mr-2"></span>
+                                        {{ $label }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <a
+                                            href="{{ url('/admin/sessions/'.$s->id.'/edit') }}"
+                                            class="p-2 hover:bg-primary/10 text-primary rounded-lg transition-colors"
+                                            title="Sửa"
+                                        >
+                                            <span class="material-symbols-outlined text-lg">edit</span>
+                                        </a>
+                                        <form method="post" action="{{ url('/admin/sessions/'.$s->id) }}" onsubmit="return confirm('Xoá trình chiếu này?')" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="p-2 hover:bg-error/10 text-error rounded-lg transition-colors" title="Xoá">
+                                                <span class="material-symbols-outlined text-lg">delete</span>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td class="py-10 text-center text-on-surface-variant" colspan="5">Chưa có trình chiếu.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if($sessions->hasPages())
+            <div class="mt-4">
+                {{ $sessions->appends(['sessions_page' => $sessions->currentPage()])->links() }}
+            </div>
+        @endif
+
+        <!-- Template Section -->
+        <div class="space-y-6 pt-6">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-bold tracking-tight text-on-surface">Mẫu lịch chiếu</h2>
+                <a href="{{ url('/admin/templates/create') }}" class="text-primary text-sm font-semibold hover:underline flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">add_circle</span>
+                    Thêm mẫu lịch
+                </a>
             </div>
 
-            <a
-                href="{{ url('/admin/templates/create') }}"
-                class="rounded-xl bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-800 whitespace-nowrap"
-            >
-                Thêm mẫu lịch
-            </a>
-        </div>
-
-        <div class="mt-6 overflow-x-auto rounded-2xl border border-neutral-200 bg-white shadow-sm">
-            <table class="w-full min-w-[640px] text-sm">
-                <thead class="bg-neutral-50 text-left text-xs font-semibold text-neutral-600">
-                    <tr>
-                        <th class="px-4 py-3">Địa điểm</th>
-                        <th class="px-4 py-3">Số khung giờ</th>
-                        <th class="px-4 py-3"></th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-neutral-200">
-                    @forelse ($templates as $template)
+            <div class="admin-card">
+                <table class="admin-table">
+                    <thead>
                         <tr>
-                            <td class="px-4 py-3 font-medium">{{ $template->venue->name }}</td>
-                            <td class="px-4 py-3 text-neutral-700">
-                                {{ $template->slots->count() }} khung giờ
-                            </td>
-                            <td class="px-4 py-3">
-                                <div class="flex items-center justify-end gap-2">
-                                    <a
-                                        href="{{ url('/admin/templates/'.$template->id.'/edit') }}"
-                                        class="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium hover:bg-neutral-50"
-                                    >
-                                        Sửa
-                                    </a>
-                                    <form method="post" action="{{ url('/admin/templates/'.$template->id) }}" onsubmit="return confirm('Xoá mẫu lịch chiếu này?')">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="rounded-lg border border-rose-300 bg-white px-3 py-1.5 text-xs font-medium text-rose-700 hover:bg-rose-50">
-                                            Xoá
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
+                            <th>Địa điểm</th>
+                            <th class="text-center">Số khung giờ</th>
+                            <th class="text-right">Thao tác</th>
                         </tr>
-                    @empty
-                        <tr>
-                            <td class="px-4 py-10 text-center text-neutral-600" colspan="3">Chưa có mẫu lịch chiếu.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="divide-y-0">
+                        @forelse ($templates as $template)
+                            <tr class="group">
+                                <td>
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-on-surface-variant">apartment</span>
+                                        </div>
+                                        <span class="font-semibold text-on-surface">{{ $template->venue->name }}</span>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="text-sm font-medium">{{ $template->slots->count() }} khung giờ</span>
+                                </td>
+                                <td>
+                                    <div class="flex items-center justify-end gap-3">
+                                        <a
+                                            href="{{ url('/admin/templates/'.$template->id.'/edit') }}"
+                                            class="px-4 py-1.5 text-xs font-bold text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors border border-outline-variant/30"
+                                        >
+                                            Sửa
+                                        </a>
+                                        <form method="post" action="{{ url('/admin/templates/'.$template->id) }}" onsubmit="return confirm('Xoá mẫu lịch chiếu này?')" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="px-4 py-1.5 text-xs font-bold text-error hover:bg-error/10 rounded-full transition-colors border border-error/20">
+                                                Xoá
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td class="py-10 text-center text-on-surface-variant" colspan="3">Chưa có mẫu lịch chiếu.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
