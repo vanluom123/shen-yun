@@ -9,12 +9,12 @@
                 </div>
 
                 <h1 class="mt-4 text-balance text-3xl font-semibold tracking-tight sm:text-4xl">
-                    Đăng ký tham dự suất diễn phòng trà
+                    Đăng ký tham dự trình chiếu phòng trà
                 </h1>
 
                 <p class="mt-3 text-pretty text-neutral-600">
-                    Vui lòng đi theo từng bước để chọn địa điểm/suất diễn, nhập thông tin và số lượng khách.
-                    Hệ thống sẽ tự động chặn đăng ký vượt quá số chỗ của suất diễn.
+                    Vui lòng đi theo từng bước để chọn địa điểm/trình chiếu, nhập thông tin và số lượng khách.
+                    Hệ thống sẽ tự động chặn đăng ký vượt quá số chỗ của trình chiếu.
                 </p>
 
                 <div class="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -53,11 +53,11 @@
                     </li>
                     <li class="flex gap-3">
                         <div class="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-emerald-500"></div>
-                        <div>Giới hạn chỗ theo từng suất diễn (an toàn khi submit đồng thời).</div>
+                        <div>Giới hạn chỗ theo từng trình chiếu (an toàn khi submit đồng thời).</div>
                     </li>
                     <li class="flex gap-3">
                         <div class="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-emerald-500"></div>
-                        <div>Admin CRUD địa điểm/suất diễn, export CSV danh sách khách.</div>
+                        <div>Admin CRUD địa điểm/trình chiếu, export CSV danh sách khách.</div>
                     </li>
                     <li class="flex gap-3">
                         <div class="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-emerald-500"></div>

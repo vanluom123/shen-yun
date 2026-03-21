@@ -39,7 +39,7 @@ class EventSessionSeeder extends Seeder
                 [
                     'capacity_total' => $capacity,
                     'capacity_reserved' => 0,
-                    'status' => 'active',
+                    'registration_status' => 'open',
                 ],
             );
         }
