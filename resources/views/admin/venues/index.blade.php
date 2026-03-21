@@ -50,7 +50,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <div class="flex items-center justify-end gap-2 transition-opacity">
                                         <a
                                             href="{{ url('/admin/venues/'.$v->id.'/edit') }}"
                                             class="p-2 hover:bg-primary/10 text-primary rounded-lg transition-colors"

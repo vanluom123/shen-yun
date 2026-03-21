@@ -9,10 +9,10 @@
 <div class="space-y-1">
     @foreach ($items as $item)
         @php
-            $active = request()->is(ltrim($item['url'], '/').'*');
-            // Specific check for home to avoid matching all admin subpaths if url is exactly /admin
-            if ($item['url'] === '/admin' && request()->path() !== 'admin') {
-                $active = false;
+            if ($item['url'] === '/admin') {
+                $active = request()->is('admin');
+            } else {
+                $active = request()->is(ltrim($item['url'], '/').'*');
             }
         @endphp
         <a 

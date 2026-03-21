@@ -55,9 +55,12 @@
         </body>
     @elseif ($isAdmin)
         <body class="min-h-dvh bg-background text-on-surface antialiased font-sans">
-            <div class="flex min-h-dvh flex-col lg:flex-row">
+            <div class="flex min-h-dvh flex-col lg:flex-row relative">
+                <!-- Mobile Backdrop -->
+                <div id="mobile-backdrop" class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity duration-300 opacity-0 lg:hidden"></div>
+
                 <!-- Sidebar -->
-                <aside class="w-full lg:w-64 bg-slate-50 border-b lg:border-b-0 lg:border-r border-outline-variant/20 flex flex-col p-4 sticky top-0 lg:h-dvh">
+                <aside id="admin-sidebar" class="fixed inset-y-0 left-0 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out lg:fixed lg:translate-x-0 w-[280px] lg:w-64 bg-slate-50 border-r border-outline-variant/20 flex flex-col p-4 shadow-xl lg:shadow-none h-dvh">
                     <div class="px-2 py-6 mb-4">
                         <h2 class="text-xl font-bold tracking-tight text-on-surface">{{ $appTitle }}</h2>
                         <p class="text-xs text-on-surface-variant opacity-70 font-medium uppercase tracking-widest mt-1">Admin Space</p>
@@ -79,11 +82,16 @@
                 </aside>
 
                 <!-- Main Area -->
-                <div class="flex-1 flex flex-col min-w-0">
+                <div class="flex-1 flex flex-col min-w-0 lg:ml-64">
                     <header class="h-16 bg-white/80 backdrop-blur-md border-b border-outline-variant/20 flex items-center justify-between px-4 sm:px-8 sticky top-0 z-30">
-                        <div class="flex items-center gap-4">
-                            <span class="lg:hidden font-bold tracking-tight text-on-surface">{{ $appTitle }}</span>
-                            <div class="hidden sm:block">
+                        <div class="flex items-center gap-3">
+                            <button id="mobile-menu-toggle" class="lg:hidden p-2 -ml-2 text-on-surface-variant hover:text-on-surface focus:outline-none flex flex-col justify-center items-center w-10 h-10 relative">
+                                <span class="block w-5 h-0.5 bg-current transition-all duration-300 ease-in-out absolute top-[14px]"></span>
+                                <span class="block w-5 h-0.5 bg-current transition-all duration-300 ease-in-out absolute top-[19px]"></span>
+                                <span class="block w-5 h-0.5 bg-current transition-all duration-300 ease-in-out absolute bottom-[14px]"></span>
+                            </button>
+                            <span class="lg:hidden font-bold tracking-tight text-on-surface text-base">THƯ MỜI - ADMIN SPACE</span>
+                            <div class="hidden lg:block">
                                 <span class="text-sm font-semibold text-on-surface-variant/60">Quản lý</span>
                                 <span class="mx-1 text-on-surface-variant/30">/</span>
                                 <span class="text-sm font-bold text-on-surface">{{ $title ?? 'Dashboard' }}</span>
@@ -118,6 +126,51 @@
                     </footer>
                 </div>
             </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const toggleBtn = document.getElementById('mobile-menu-toggle');
+                    const sidebar = document.getElementById('admin-sidebar');
+                    const backdrop = document.getElementById('mobile-backdrop');
+                    
+                    if (!toggleBtn || !sidebar || !backdrop) return;
+                    
+                    const topBar = toggleBtn.querySelector('span:nth-child(1)');
+                    const middleBar = toggleBtn.querySelector('span:nth-child(2)');
+                    const bottomBar = toggleBtn.querySelector('span:nth-child(3)');
+
+                    function toggleMenu() {
+                        const isOpen = !sidebar.classList.contains('-translate-x-full');
+                        
+                        if (isOpen) {
+                            // Close
+                            sidebar.classList.add('-translate-x-full');
+                            backdrop.classList.add('opacity-0');
+                            setTimeout(() => backdrop.classList.add('hidden'), 300);
+                            
+                            // Animate hamburger back to 3 lines
+                            topBar.style.transform = 'none';
+                            middleBar.style.opacity = '1';
+                            bottomBar.style.transform = 'none';
+                        } else {
+                            // Open
+                            sidebar.classList.remove('-translate-x-full');
+                            backdrop.classList.remove('hidden');
+                            // Trigger reflow UI sync
+                            void backdrop.offsetWidth;
+                            backdrop.classList.remove('opacity-0');
+                            
+                            // Animate to X (distance between top/bottom and center)
+                            topBar.style.transform = 'translateY(5px) rotate(45deg)';
+                            middleBar.style.opacity = '0';
+                            bottomBar.style.transform = 'translateY(-5px) rotate(-45deg)';
+                        }
+                    }
+
+                    toggleBtn.addEventListener('click', toggleMenu);
+                    backdrop.addEventListener('click', toggleMenu);
+                });
+            </script>
         </body>
     @else
         <body class="min-h-dvh bg-transparent text-neutral-900">
