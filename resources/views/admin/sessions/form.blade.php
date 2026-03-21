@@ -11,9 +11,9 @@
             required
             class="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900"
         >
-            <option value="" disabled {{ empty(old('venue_id', $session?->venue_id)) ? 'selected' : '' }}>Chọn địa điểm…</option>
+            <option value="" disabled {{ empty(old('venue_id', $session?->venue_id ?? $default_venue_id ?? null)) ? 'selected' : '' }}>Chọn địa điểm…</option>
             @foreach ($venues as $v)
-                <option value="{{ $v->id }}" {{ (string) old('venue_id', $session?->venue_id) === (string) $v->id ? 'selected' : '' }}>
+                <option value="{{ $v->id }}" {{ (string) old('venue_id', $session?->venue_id ?? $default_venue_id ?? null) === (string) $v->id ? 'selected' : '' }}>
                     {{ $v->name }}
                 </option>
             @endforeach
@@ -26,7 +26,7 @@
             id="starts_at"
             name="starts_at"
             type="datetime-local"
-            value="{{ old('starts_at', $session?->starts_at?->format('Y-m-d\\TH:i') ?? '') }}"
+            value="{{ old('starts_at', $session?->starts_at?->format('Y-m-d\TH:i') ?? $default_starts_at ?? '') }}"
             required
             class="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900"
         />
@@ -34,28 +34,28 @@
 
     <div class="grid gap-4 sm:grid-cols-2">
         <div>
-            <label class="text-sm font-medium" for="capacity_total">Capacity tổng</label>
+            <label class="text-sm font-medium" for="capacity_total">Số lượng ghế</label>
             <input
                 id="capacity_total"
                 name="capacity_total"
                 type="number"
                 min="1"
-                value="{{ old('capacity_total', $session?->capacity_total ?? 1) }}"
+                value="{{ old('capacity_total', $session?->capacity_total ?? $default_capacity ?? 36) }}"
                 required
                 class="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900"
             />
         </div>
 
         <div>
-            <label class="text-sm font-medium" for="status">Status</label>
+            <label class="text-sm font-medium" for="registration_status">Trạng thái</label>
             <select
-                id="status"
-                name="status"
+                id="registration_status"
+                name="registration_status"
                 required
                 class="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900"
             >
-                @foreach (['active' => 'active', 'closed' => 'closed'] as $val => $label)
-                    <option value="{{ $val }}" {{ (string) old('status', $session?->status ?? 'active') === (string) $val ? 'selected' : '' }}>
+                @foreach (['open' => 'Hoạt động', 'paused' => 'Tạm hoãn', 'hidden' => 'Ẩn'] as $val => $label)
+                    <option value="{{ $val }}" {{ old('registration_status', $session?->registration_status ?? 'open') === $val ? 'selected' : '' }}>
                         {{ $label }}
                     </option>
                 @endforeach

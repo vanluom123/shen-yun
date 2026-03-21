@@ -11,10 +11,6 @@ class RegisterAccessController extends Controller
 {
     public function show()
     {
-        if (Session::get('admin_authed', false)) {
-            return redirect()->to('/admin');
-        }
-
         if (Session::get('guest_authed', false)) {
             return redirect()->to('/register');
         }
@@ -29,16 +25,6 @@ class RegisterAccessController extends Controller
         ]);
 
         $input = trim((string) $data['password']);
-
-        // 1 page: if password matches ADMIN_PASSWORD => admin, else try guest password.
-        $adminExpected = trim((string) config('rsvp.admin_password'));
-        if ($adminExpected !== '' && hash_equals($adminExpected, $input)) {
-            Session::forget('guest_authed');
-            Session::forget('registration_draft_v1');
-            Session::put('admin_authed', true);
-
-            return redirect()->to('/admin');
-        }
 
         $expected = trim((string) config('rsvp.guest_password'));
         if ($expected === '') {

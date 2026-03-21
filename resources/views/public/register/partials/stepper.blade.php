@@ -1,6 +1,6 @@
 @php
     $steps = [
-        1 => 'Chọn suất diễn',
+        1 => 'Chọn trình chiếu',
         2 => 'Thông tin',
         3 => 'Số lượng',
         4 => 'Xác nhận',
@@ -32,5 +32,4 @@
             @endforeach
         </div>
     </div>
-</div>
 
