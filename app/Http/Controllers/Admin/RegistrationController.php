@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\EventSession;
 use App\Models\Registration;
+use App\Models\Venue;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -24,14 +26,32 @@ class RegistrationController extends Controller
 
     public function index(Request $request)
     {
-        $regs = Registration::query()
+        $query = Registration::query()
             ->with('eventSession.venue')
-            ->orderByDesc('created_at')
-            ->paginate(30)
-            ->withQueryString();
+            ->orderByDesc('created_at');
+
+        $status = $request->query('status');
+        if ($status && in_array($status, ['confirmed', 'cancelled'])) {
+            $query->where('status', $status);
+        }
+
+        $sessionId = $request->query('session_id');
+        if ($sessionId) {
+            $query->where('event_session_id', $sessionId);
+        }
+
+        $regs = $query->paginate(30)->withQueryString();
+
+        $sessions = EventSession::query()
+            ->with('venue')
+            ->orderBy('starts_at', 'desc')
+            ->get();
 
         return view('admin.registrations.index', [
             'registrations' => $regs,
+            'statusFilter' => $status,
+            'sessionIdFilter' => $sessionId,
+            'sessions' => $sessions,
         ]);
     }
 
@@ -40,6 +60,16 @@ class RegistrationController extends Controller
         $query = Registration::query()
             ->with('eventSession.venue')
             ->orderBy('created_at');
+
+        $status = $request->query('status');
+        if ($status && in_array($status, ['confirmed', 'cancelled'])) {
+            $query->where('status', $status);
+        }
+
+        $sessionId = $request->query('session_id');
+        if ($sessionId) {
+            $query->where('event_session_id', $sessionId);
+        }
         $filename = 'registrations.csv';
 
         return response()->streamDownload(function () use ($query) {
@@ -74,7 +104,7 @@ class RegistrationController extends Controller
                     'Mã',
                     'Tạo lúc',
                     'Địa điểm',
-                    'Suất diễn',
+                    'Trình chiếu',
                     'Họ tên',
                     'Email',
                     'Phone',
@@ -123,6 +153,16 @@ class RegistrationController extends Controller
             ->with('eventSession.venue')
             ->orderBy('created_at');
 
+        $status = $request->query('status');
+        if ($status && in_array($status, ['confirmed', 'cancelled'])) {
+            $query->where('status', $status);
+        }
+
+        $sessionId = $request->query('session_id');
+        if ($sessionId) {
+            $query->where('event_session_id', $sessionId);
+        }
+
         $filename = 'registrations.xls';
 
         return response()->streamDownload(function () use ($query) {
@@ -142,7 +182,7 @@ class RegistrationController extends Controller
             fwrite($out, "<col style=\"width:60px\">");   // Mã
             fwrite($out, "<col style=\"width:120px\">");  // Tạo lúc
             fwrite($out, "<col style=\"width:160px\">");  // Địa điểm
-            fwrite($out, "<col style=\"width:140px\">");  // Suất diễn
+            fwrite($out, "<col style=\"width:140px\">");  // Trình chiếu
             fwrite($out, "<col style=\"width:180px\">");  // Họ tên
             fwrite($out, "<col style=\"width:240px\">");  // Email
             fwrite($out, "<col style=\"width:140px\">");  // Phone
@@ -160,7 +200,7 @@ class RegistrationController extends Controller
                 'Mã',
                 'Tạo lúc',
                 'Địa điểm',
-                'Suất diễn',
+                'Trình chiếu',
                 'Họ tên',
                 'Email',
                 'Phone',
@@ -210,5 +250,86 @@ class RegistrationController extends Controller
         }, $filename, [
             'Content-Type' => 'application/vnd.ms-excel; charset=UTF-8',
         ]);
+    }
+
+    public function edit(Registration $registration)
+    {
+        $venues = Venue::query()->orderBy('name')->get();
+        $sessions = EventSession::query()
+            ->with('venue')
+            ->where('starts_at', '>=', now())
+            ->orderBy('starts_at')
+            ->get();
+
+        return view('admin.registrations.edit', [
+            'registration' => $registration,
+            'venues' => $venues,
+            'sessions' => $sessions,
+        ]);
+    }
+
+    public function update(Request $request, Registration $registration)
+    {
+        $data = $request->validate([
+            'full_name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:32'],
+            'event_session_id' => ['required', 'exists:event_sessions,id'],
+            'adult_count' => ['required', 'integer', 'min:0', 'max:999'],
+            'ntl_count' => ['required', 'integer', 'min:0', 'max:999'],
+            'ntl_new_count' => ['required', 'integer', 'min:0', 'max:999'],
+            'child_count' => ['required', 'integer', 'min:0', 'max:999'],
+        ]);
+
+        $oldSessionId = $registration->event_session_id;
+        $oldTotalCount = $registration->total_count;
+
+        $total = (int) $data['adult_count']
+            + (int) $data['ntl_count']
+            + (int) $data['ntl_new_count']
+            + (int) $data['child_count'];
+
+        $data['total_count'] = $total;
+
+        $registration->update($data);
+
+        if ($registration->status === 'confirmed') {
+            if ($oldSessionId !== $registration->event_session_id) {
+                EventSession::recalculateReserved($oldSessionId);
+                EventSession::recalculateReserved($registration->event_session_id);
+            } elseif ($oldTotalCount !== $total) {
+                EventSession::recalculateReserved($registration->event_session_id);
+            }
+        }
+
+        return redirect()->to('/admin/registrations')->with('success', 'Cập nhật thành công.');
+    }
+
+    public function cancel(Registration $registration)
+    {
+        $wasConfirmed = $registration->status === 'confirmed';
+        $sessionId = $registration->event_session_id;
+
+        $registration->update(['status' => 'cancelled']);
+
+        if ($wasConfirmed) {
+            EventSession::recalculateReserved($sessionId);
+        }
+
+        return redirect()->to('/admin/registrations')->with('success', 'Đã hủy đăng ký.');
+    }
+
+    public function destroy(Registration $registration)
+    {
+        $wasConfirmed = $registration->status === 'confirmed';
+        $sessionId = $registration->event_session_id;
+
+        $registration->delete();
+
+        if ($wasConfirmed) {
+            EventSession::recalculateReserved($sessionId);
+        }
+
+        return redirect()->to('/admin/registrations')->with('success', 'Đã xóa đăng ký.');
     }
 }

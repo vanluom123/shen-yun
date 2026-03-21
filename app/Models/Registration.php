@@ -25,6 +25,20 @@ class Registration extends Model
         'attend_with_guest' => 'boolean',
     ];
 
+    protected $attributes = [
+        'status' => 'confirmed',
+    ];
+
+    public function isConfirmed(): bool
+    {
+        return $this->status === 'confirmed';
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->status === 'cancelled';
+    }
+
     public function eventSession(): BelongsTo
     {
         return $this->belongsTo(EventSession::class);

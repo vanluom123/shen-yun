@@ -18,10 +18,16 @@ class EventSessionController extends Controller
         $sessions = EventSession::query()
             ->with('venue')
             ->orderByDesc('starts_at')
-            ->paginate(20);
+            ->paginate(20, ['*'], 'sessions_page');
+
+        $templates = \App\Models\SessionTemplate::query()
+            ->with(['venue', 'slots'])
+            ->orderBy('id')
+            ->get();
 
         return view('admin.sessions.index', [
             'sessions' => $sessions,
+            'templates' => $templates,
         ]);
     }
 
@@ -32,8 +38,19 @@ class EventSessionController extends Controller
     {
         $venues = Venue::query()->orderBy('name')->get();
 
+        $defaultVenue = Venue::query()
+            ->whereRaw('LOWER(name) = ?', ['nx-lp 96 vinhomes grand park'])
+            ->first();
+
+        $defaultStartsAt = Carbon::now()
+            ->startOfWeek(Carbon::SUNDAY)
+            ->setTime(14, 30, 0);
+
         return view('admin.sessions.create', [
             'venues' => $venues,
+            'default_venue_id' => $defaultVenue?->id,
+            'default_starts_at' => $defaultStartsAt->format('Y-m-d\TH:i'),
+            'default_capacity' => 36,
         ]);
     }
 
@@ -47,14 +64,14 @@ class EventSessionController extends Controller
             'venue_id' => ['required', 'integer', 'in:'.implode(',', $venues)],
             'starts_at' => ['required', 'date'],
             'capacity_total' => ['required', 'integer', 'min:1', 'max:100000'],
-            'status' => ['required', 'string', 'max:32'],
+            'registration_status' => ['required', 'string', 'max:32'],
         ]);
 
         $data['capacity_reserved'] = 0;
 
         EventSession::query()->create($data);
 
-        return redirect()->to('/admin/sessions')->with('status', 'Đã tạo suất diễn.');
+        return redirect()->to('/admin/sessions')->with('status', 'Đã tạo trình chiếu.');
     }
 
     /**
@@ -88,12 +105,12 @@ class EventSessionController extends Controller
             'venue_id' => ['required', 'integer', 'in:'.implode(',', $venues)],
             'starts_at' => ['required', 'date'],
             'capacity_total' => ['required', 'integer', 'min:1', 'max:100000'],
-            'status' => ['required', 'string', 'max:32'],
+            'registration_status' => ['required', 'string', 'max:32'],
         ]);
 
         $session->update($data);
 
-        return redirect()->to('/admin/sessions')->with('status', 'Đã cập nhật suất diễn.');
+        return redirect()->to('/admin/sessions')->with('status', 'Đã cập nhật trình chiếu.');
     }
 
     /**
@@ -103,6 +120,37 @@ class EventSessionController extends Controller
     {
         $session->delete();
 
-        return redirect()->to('/admin/sessions')->with('status', 'Đã xoá suất diễn.');
+        return redirect()->to('/admin/sessions')->with('status', 'Đã xoá trình chiếu.');
+    }
+
+    /**
+     * Remove multiple sessions from storage.
+     */
+    public function destroyMultiple(Request $request)
+    {
+        $ids = $request->input('session_ids', []);
+
+        if (empty($ids)) {
+            return redirect()->to('/admin/sessions')->with('status', 'Vui lòng chọn ít nhất một trình chiếu.');
+        }
+
+        $count = EventSession::query()->whereIn('id', $ids)->delete();
+
+        return redirect()->to('/admin/sessions')->with('status', "Đã xoá {$count} trình chiếu.");
+    }
+
+    /**
+     * Manually trigger session generation for all venues with templates.
+     */
+    public function generate(Request $request)
+    {
+        $generatorService = app(\App\Services\SessionGeneratorService::class);
+        $count = $generatorService->generateForAllVenues();
+        
+        $message = $count > 0 
+            ? "Đã tạo {$count} trình chiếu."
+            : "Không có trình chiếu mới cần tạo.";
+        
+        return redirect()->to('/admin/sessions')->with('status', $message);
     }
 }

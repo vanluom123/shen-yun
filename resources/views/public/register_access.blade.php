@@ -32,6 +32,12 @@
         <button type="submit" class="btn-gold w-full">
             TIẾP TỤC
         </button>
+
+        <div class="mt-8 text-center">
+            <a href="{{ url('/admin/login') }}" class="text-xs text-neutral-400 hover:text-[#f3e2b6] transition-colors">
+                Bạn là quản trị viên? Đăng nhập tại đây
+            </a>
+        </div>
     </form>
 @endsection
 
