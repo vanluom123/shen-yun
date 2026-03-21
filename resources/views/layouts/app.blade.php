@@ -99,7 +99,7 @@
                         </div>
                     </header>
 
-                    <main class="flex-1 p-5 sm:p-10 max-w-7xl">
+                    <main class="flex-1 p-5 sm:p-10">
                         @if (session('status'))
                             <div class="mb-6 rounded-2xl border border-emerald-200/60 bg-emerald-50/90 px-4 py-3 text-emerald-900 shadow-sm">
                                 {{ session('status') }}
