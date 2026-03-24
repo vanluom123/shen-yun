@@ -16,7 +16,7 @@
                 </div>
 
                 <a
-                    href="{{ url('/admin/registrations/export.xls') }}?status={{ $statusFilter }}&session_id={{ $sessionIdFilter }}"
+                    href="{{ url('/admin/registrations/export.xls') }}?status={{ $statusFilter }}&session_id={{ $sessionIdFilter }}&phone={{ $phoneFilter }}"
                     class="inline-flex items-center justify-center rounded-3xl bg-[#1a1a1a] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800"
                 >
                     Xuất Excel
@@ -27,12 +27,28 @@
                 <div class="relative">
                     <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-500">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                        </svg>
+                    </div>
+                    <input
+                        type="text"
+                        id="phoneFilter"
+                        placeholder="Tìm số điện thoại..."
+                        value="{{ $phoneFilter ?? '' }}"
+                        class="w-auto min-w-[200px] rounded-xl border border-neutral-200 bg-white py-2 pl-9 pr-4 text-sm text-neutral-700 outline-none hover:bg-neutral-50 focus:border-neutral-300"
+                        onkeypress="if(event.key === 'Enter') applyFilters()"
+                    >
+                </div>
+
+                <div class="relative">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </div>
                     <select
                         id="sessionFilter"
-                        class="w-auto min-w-[200px] appearance-none rounded-full border border-neutral-200 bg-white py-2 pl-9 pr-8 text-sm text-neutral-700 outline-none hover:bg-neutral-50 focus:border-neutral-300"
+                        class="w-auto min-w-[200px] appearance-none rounded-xl border border-neutral-200 bg-white py-2 pl-9 pr-8 text-sm text-neutral-700 outline-none hover:bg-neutral-50 focus:border-neutral-300"
                         onchange="applyFilters()"
                     >
                         <option value="">Trình chiếu: Tất cả</option>
@@ -57,7 +73,7 @@
                     </div>
                     <select
                         id="statusFilter"
-                        class="w-auto min-w-[180px] appearance-none rounded-full border border-neutral-200 bg-white py-2 pl-9 pr-8 text-sm text-neutral-700 outline-none hover:bg-neutral-50 focus:border-neutral-300"
+                        class="w-auto min-w-[180px] appearance-none rounded-xl border border-neutral-200 bg-white py-2 pl-9 pr-8 text-sm text-neutral-700 outline-none hover:bg-neutral-50 focus:border-neutral-300"
                         onchange="applyFilters()"
                     >
                         <option value="" {{ empty($statusFilter) ? 'selected' : '' }}>Trạng thái: Tất cả</option>
@@ -80,8 +96,8 @@
                     <tr class="[&>th]:px-5 [&>th]:py-4">
                         <th class="w-20 pl-6">Mã</th>
                         <th class="w-56">Người mời</th>
-                        <th class="w-72">Gmail</th>
                         <th class="w-40">SĐT</th>
+                        <th class="w-72">Gmail</th>
                         <th class="w-36">Trình chiếu</th>
                         <th class="w-24">Khách</th>
                         <th class="w-24">NTL</th>
@@ -89,8 +105,7 @@
                         <th class="w-24">Trẻ em</th>
                         <th class="w-24">Tổng</th>
                         <th class="w-24">Trạng thái</th>
-                        <th class="w-36">Tạo lúc</th>
-                        <th class="w-20 pr-6"></th>
+                        <th class="w-20 pr-6">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-neutral-200/70">
@@ -101,9 +116,6 @@
                                 <a href="{{ url('/admin/registrations/'.$r->id.'/edit') }}" class="block min-h-[44px] min-w-[44px] flex items-center font-semibold text-neutral-900 hover:underline">
                                     {{ $r->full_name }}
                                 </a>
-                            </td>
-                            <td class="px-5 py-4">
-                                <div class="text-neutral-900">{{ $r->email }}</div>
                             </td>
                             <td class="px-5 py-4 whitespace-nowrap">
                                 @if($r->phone)
@@ -120,24 +132,32 @@
                                     <div class="text-neutral-900">—</div>
                                 @endif
                             </td>
+                            <td class="px-5 py-4">
+                                <div class="text-neutral-900">{{ $r->email }}</div>
+                            </td>
                             <td class="px-5 py-4 whitespace-nowrap">
                                 <div class="font-semibold text-neutral-900">{{ $r->eventSession->starts_at->format('d/m/Y H:i') }}</div>
                             </td>
-                            <td class="px-5 py-4 font-semibold text-neutral-900">{{ $r->adult_count }}</td>
-                            <td class="px-5 py-4 font-semibold text-neutral-900">{{ $r->ntl_count }}</td>
-                            <td class="px-5 py-4 font-semibold text-neutral-900">{{ $r->ntl_new_count }}</td>
-                            <td class="px-5 py-4 font-semibold text-neutral-900">{{ $r->child_count }}</td>
-                            <td class="px-5 py-4 font-semibold text-neutral-900">{{ $r->total_count }}</td>
-                            <td class="px-5 py-4">
+                            <td class="px-5 py-4 font-semibold text-neutral-900 text-center">{{ $r->adult_count }}</td>
+                            <td class="px-5 py-4 font-semibold text-neutral-900 text-center">{{ $r->ntl_count }}</td>
+                            <td class="px-5 py-4 font-semibold text-neutral-900 text-center">{{ $r->ntl_new_count }}</td>
+                            <td class="px-5 py-4 font-semibold text-neutral-900 text-center">{{ $r->child_count }}</td>
+                            <td class="px-5 py-4 font-semibold text-neutral-900 text-center">{{ $r->total_count }}</td>
+                            <td class="px-5 py-4 text-center">
                                 @if($r->status === 'confirmed')
                                     <span class="text-lg" title="Đã xác nhận">✅</span>
                                 @else
                                     <span class="text-lg" title="Đã hủy">❌</span>
                                 @endif
                             </td>
-                            <td class="px-5 py-4 text-neutral-800 whitespace-nowrap">{{ $r->created_at->format('d/m/Y H:i') }}</td>
-                            <td class="pr-6 py-4">
-                                <a href="{{ url('/admin/registrations/'.$r->id.'/edit') }}" class="text-sm text-neutral-700 hover:underline">Sửa</a>
+                            <td class="pr-6 py-4 text-center">
+                                <a
+                                    href="{{ url('/admin/registrations/'.$r->id.'/edit') }}"
+                                    class="p-2 hover:bg-primary/10 text-primary rounded-lg transition-colors"
+                                    title="Sửa"
+                                >
+                                    <span class="material-symbols-outlined text-lg">edit</span>
+                                </a>
                             </td>
                         </tr>
                     @empty
@@ -203,9 +223,11 @@
         function applyFilters() {
             const session = document.getElementById('sessionFilter').value;
             const status = document.getElementById('statusFilter').value;
+            const phone = document.getElementById('phoneFilter').value;
             let url = new URL('{{ url("/admin/registrations") }}');
             if (session) url.searchParams.set('session_id', session);
             if (status) url.searchParams.set('status', status);
+            if (phone) url.searchParams.set('phone', phone);
             window.location.href = url.toString();
         }
     </script>

@@ -4,7 +4,7 @@
     <div class="grid gap-8 lg:grid-cols-12 lg:items-start">
         <div class="lg:col-span-7">
             <div class="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
-                <div class="inline-flex items-center gap-2 rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
+                <div class="inline-flex items-center gap-2 rounded-xl bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
                     RSVP • Đăng ký tham dự
                 </div>
 
@@ -48,19 +48,19 @@
                 <div class="text-sm font-semibold">Bạn sẽ làm được gì?</div>
                 <ul class="mt-3 space-y-3 text-sm text-neutral-700">
                     <li class="flex gap-3">
-                        <div class="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-emerald-500"></div>
+                        <div class="mt-0.5 h-2 w-2 shrink-0 rounded-xl bg-emerald-500"></div>
                         <div>Đăng ký theo wizard 4 bước, validate rõ ràng.</div>
                     </li>
                     <li class="flex gap-3">
-                        <div class="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-emerald-500"></div>
+                        <div class="mt-0.5 h-2 w-2 shrink-0 rounded-xl bg-emerald-500"></div>
                         <div>Giới hạn chỗ theo từng trình chiếu (an toàn khi submit đồng thời).</div>
                     </li>
                     <li class="flex gap-3">
-                        <div class="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-emerald-500"></div>
+                        <div class="mt-0.5 h-2 w-2 shrink-0 rounded-xl bg-emerald-500"></div>
                         <div>Admin CRUD địa điểm/trình chiếu, export CSV danh sách khách.</div>
                     </li>
                     <li class="flex gap-3">
-                        <div class="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-emerald-500"></div>
+                        <div class="mt-0.5 h-2 w-2 shrink-0 rounded-xl bg-emerald-500"></div>
                         <div>Gửi email xác nhận qua SMTP (Gmail App Password).</div>
                     </li>
                 </ul>

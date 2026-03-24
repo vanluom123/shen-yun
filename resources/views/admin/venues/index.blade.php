@@ -45,7 +45,7 @@
                                     <span class="text-sm text-on-surface-variant">{{ $v->address ?? '—' }}</span>
                                 </td>
                                 <td>
-                                    <span class="px-3 py-1 bg-surface-container rounded-full text-xs font-medium text-on-surface-variant">
+                                    <span class="px-3 py-1 bg-surface-container rounded-xl text-xs font-medium text-on-surface-variant">
                                         {{ $v->timezone }}
                                     </span>
                                 </td>

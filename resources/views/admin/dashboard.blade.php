@@ -11,7 +11,7 @@
             
             <form method="post" action="{{ url('/admin/logout') }}">
                 @csrf
-                <button class="px-6 py-2.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface border border-outline-variant/30 rounded-full text-sm font-bold active:scale-95 transition-all flex items-center gap-2">
+                <button class="px-6 py-2.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface border border-outline-variant/30 rounded-xl text-sm font-bold active:scale-95 transition-all flex items-center gap-2">
                     <span class="material-symbols-outlined text-sm">logout</span>
                     Đăng xuất
                 </button>
