@@ -22,7 +22,7 @@
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             <a href="{{ url('/admin/venues') }}" class="admin-card p-6 group hover:translate-y-[-4px] transition-all duration-300">
                 <div class="flex items-start justify-between">
-                    <div class="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
                         <span class="material-symbols-outlined text-2xl fill-1">location_on</span>
                     </div>
                     <span class="material-symbols-outlined text-on-surface-variant/30 group-hover:translate-x-1 transition-transform">arrow_forward</span>
@@ -33,7 +33,7 @@
 
             <a href="{{ url('/admin/sessions') }}" class="admin-card p-6 group hover:translate-y-[-4px] transition-all duration-300">
                 <div class="flex items-start justify-between">
-                    <div class="w-12 h-12 rounded-2xl bg-secondary-container flex items-center justify-center text-on-secondary-container mb-4 group-hover:scale-110 transition-transform">
+                    <div class="w-12 h-12 rounded-xl bg-secondary-container flex items-center justify-center text-on-secondary-container mb-4 group-hover:scale-110 transition-transform">
                         <span class="material-symbols-outlined text-2xl fill-1">present_to_all</span>
                     </div>
                     <span class="material-symbols-outlined text-on-surface-variant/30 group-hover:translate-x-1 transition-transform">arrow_forward</span>
@@ -44,7 +44,7 @@
 
             <div class="admin-card p-6 opacity-60">
                 <div class="flex items-start justify-between">
-                    <div class="w-12 h-12 rounded-2xl bg-surface-container-high flex items-center justify-center text-on-surface-variant mb-4">
+                    <div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-on-surface-variant mb-4">
                         <span class="material-symbols-outlined text-2xl">settings</span>
                     </div>
                 </div>

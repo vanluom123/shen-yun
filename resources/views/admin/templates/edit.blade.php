@@ -12,7 +12,7 @@
             </a>
         </div>
 
-        <div class="mt-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div class="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
             @if ($errors->any())
                 <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
                     <p class="text-sm font-medium text-red-800">Có lỗi xảy ra:</p>

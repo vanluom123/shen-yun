@@ -64,7 +64,7 @@
     /* HD dark background for the RSVP flow only */
     body.rsvp-shell {
         background-color: var(--color-deep-forest);
-        @apply px-4 sm:px-6 max-w-xl mx-auto py-6 md:py-10 lg:py-12;
+        @apply px-4 sm:px-6 max-w-xl mx-auto py-8 md:py-10 lg:py-12;
     }
 
     /* Access page: zoom-out background slightly */
@@ -160,11 +160,11 @@
     }
 
     .rsvp-input {
-        @apply w-full rounded-2xl border border-neutral-500/22 bg-white/5 px-4 py-2.5 text-sm text-neutral-100 outline-none focus:border-[#d9b76f]/70;
+        @apply w-full rounded-xl border border-neutral-500/22 bg-white/5 px-4 py-2.5 text-sm text-neutral-100 outline-none focus:border-[#d9b76f]/70;
     }
 
     .rsvp-select {
-        @apply w-full rounded-2xl border border-neutral-500/22 bg-black/10 px-4 py-2.5 text-sm text-neutral-100 outline-none focus:border-[#d9b76f]/70;
+        @apply w-full rounded-xl border border-neutral-500/22 bg-black/10 px-4 py-2.5 text-sm text-neutral-100 outline-none focus:border-[#d9b76f]/70;
         appearance: none;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23d9b76f'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
         background-repeat: no-repeat;
@@ -209,7 +209,7 @@
     }
 
     .custom-select-dropdown {
-        @apply absolute z-50 mt-1 w-full overflow-hidden rounded-2xl border border-neutral-500/30 bg-[#506351] shadow-[var(--shadow-panel)] opacity-0 invisible max-h-0 transition-all duration-200;
+        @apply absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-neutral-500/30 bg-[#506351] shadow-[var(--shadow-panel)] opacity-0 invisible max-h-0 transition-all duration-200;
     }
 
     .custom-select.open .custom-select-dropdown {
@@ -288,11 +288,11 @@
     }
 
     .rsvp-pill {
-        @apply inline-flex items-center gap-2 rounded-2xl border border-[#d9b76f]/35 bg-black/25 px-4 py-2 text-xs text-[#f3e2b6];
+        @apply inline-flex items-center gap-2 rounded-xl border border-[#d9b76f]/35 bg-black/25 px-4 py-2 text-xs text-[#f3e2b6];
     }
 
     .rsvp-banner {
-        @apply mb-5 rounded-2xl border border-[#d9b76f]/22 bg-black/14 px-4 py-3 text-sm text-[#f3e2b6];
+        @apply mb-5 rounded-xl border border-[#d9b76f]/22 bg-black/14 px-4 py-3 text-sm text-[#f3e2b6];
     }
 
     .rsvp-counter-btn {
@@ -300,11 +300,11 @@
     }
 
     .rsvp-counter-value {
-        @apply inline-flex h-10 min-w-16 items-center justify-center rounded-2xl border border-neutral-500/22 bg-black/9 px-3.5 text-base font-semibold text-neutral-100;
+        @apply inline-flex h-10 min-w-16 items-center justify-center rounded-xl border border-neutral-500/22 bg-black/9 px-3.5 text-base font-semibold text-neutral-100;
     }
 
     .rsvp-counter-input {
-        @apply h-10 w-16 rounded-2xl border border-neutral-500/22 bg-black/9 text-center text-base font-semibold text-neutral-100 outline-none focus:border-[#d9b76f]/60;
+        @apply h-10 w-16 rounded-xl border border-neutral-500/22 bg-black/9 text-center text-base font-semibold text-neutral-100 outline-none focus:border-[#d9b76f]/60;
         /* Hide spin buttons for a cleaner look while keeping numeric functionality */
         appearance: textfield;
         -moz-appearance: textfield;
@@ -339,6 +339,11 @@
         border-top: 0;
         border-left: 0;
         border-right: 0;
+    }
+
+    .success-note{
+        font-family: Cormorant Garamond, serif;
+        @apply text-sm text-center mt-4 text-[#f3e2b6]/90 ;
     }
 }
 

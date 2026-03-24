@@ -36,6 +36,7 @@
                     </div>
                 </main>
             </div>
+            <x-floating-contact-widget />
         </body>
     @elseif ($isAdmin)
         <body class="min-h-dvh bg-background text-on-surface antialiased font-sans">
@@ -85,13 +86,13 @@
 
                     <main class="flex-1 p-5 sm:p-10">
                         @if (session('status'))
-                            <div class="mb-6 rounded-2xl border border-emerald-200/60 bg-emerald-50/90 px-4 py-3 text-emerald-900 shadow-sm">
+                            <div class="mb-6 rounded-xl border border-emerald-200/60 bg-emerald-50/90 px-4 py-3 text-emerald-900 shadow-sm">
                                 {{ session('status') }}
                             </div>
                         @endif
 
                         @if ($errors->any())
-                            <div class="mb-6 rounded-2xl border border-rose-200/70 bg-rose-50/90 px-4 py-3 text-rose-900 shadow-sm">
+                            <div class="mb-6 rounded-xl border border-rose-200/70 bg-rose-50/90 px-4 py-3 text-rose-900 shadow-sm">
                                 <div class="font-bold">Có lỗi xảy ra</div>
                                 <ul class="mt-2 list-disc pl-5 text-sm">
                                     @foreach ($errors->all() as $error)
@@ -188,7 +189,7 @@
 
                 <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
                     @if (session('status'))
-                        <div class="mb-6 rounded-2xl border border-emerald-200/60 bg-emerald-50/90 px-4 py-3 text-emerald-900 backdrop-blur">
+                        <div class="mb-6 rounded-xl border border-emerald-200/60 bg-emerald-50/90 px-4 py-3 text-emerald-900 backdrop-blur">
                             {{ session('status') }}
                         </div>
                     @endif

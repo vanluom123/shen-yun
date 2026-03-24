@@ -10,7 +10,7 @@
     </div>
 
     <div class="guest-infor mt-2 rounded-xl border p-6">
-        <div class="flex flex-col gap-4">
+        <div>
             <div>
                 <span class="text-xs tracking-[0.2em] text-neutral-200/75">TỔNG SỐ KHÁCH: </span>
                 <span class="mt-1 text-2xl font-semibold text-neutral-100">{{ $registration->total_count }}</span>
@@ -27,6 +27,11 @@
                 @if ($registration->eventSession->venue->address)
                     <div class="mt-1 text-sm text-neutral-200/80">{{ $registration->eventSession->venue->address }}</div>
                 @endif
+            </div>
+            <div class="success-note">
+                <p>Quý khách vui lòng đến trước 15 phút!</p>
+                <p>Trang phục trang nhã, lịch sự!</p>
+                <p>Hân hạnh đón tiếp Quý khách!</p>
             </div>
         </div>
     </div>

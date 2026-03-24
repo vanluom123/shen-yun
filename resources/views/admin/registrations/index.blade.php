@@ -73,7 +73,7 @@
             </div>
         </div>
 
-        <div class="mt-6 overflow-hidden rounded-2xl border border-white/35 bg-white/70 shadow-sm">
+        <div class="mt-6 overflow-hidden rounded-xl border border-white/35 bg-white/70 shadow-sm">
             <div class="overflow-x-auto">
                 <table class="min-w-full w-full text-sm">
                 <thead class="bg-white/70 text-left text-xs font-semibold text-neutral-700">

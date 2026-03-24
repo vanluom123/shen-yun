@@ -21,7 +21,7 @@
         </div>
     @endif
 
-    <div class="mt-6 overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm">
+    <div class="mt-6 overflow-hidden rounded-xl border border-neutral-200 bg-white shadow-sm">
         <table class="w-full text-sm">
             <thead class="bg-neutral-50 text-left text-xs font-semibold text-neutral-600">
                 <tr>

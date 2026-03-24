@@ -12,7 +12,7 @@
             </a>
         </div>
 
-        <div class="mt-6 rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+        <div class="mt-6 rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
             <form method="post" action="{{ url('/admin/sessions/'.$session->id) }}">
                 @csrf
                 @method('PUT')

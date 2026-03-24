@@ -29,11 +29,11 @@
             <div class="rsvp-label">Ngày diễn ra sự kiện <span class="text-red-500">*</span></div>
 
             @if ($sessions->isEmpty())
-                <div class="mt-3 rounded-2xl border border-neutral-500/30 bg-black/25 px-4 py-3 text-sm text-neutral-200/80">
+                <div class="rounded-xl border border-neutral-500/30 bg-black/25 px-4 py-3 text-sm text-neutral-200/80">
                     Hiện chưa có trình chiếu nào sắp diễn ra. Vui lòng quay lại sau hoặc liên hệ ban tổ chức.
                 </div>
             @else
-                <div class="mt-3 grid gap-3 sm:grid-cols-2">
+                <div class="grid gap-3 sm:grid-cols-2">
                     @foreach ($sessions as $s)
                         @php
                             $remaining = max(0, $s->capacity_total - $s->capacity_reserved);

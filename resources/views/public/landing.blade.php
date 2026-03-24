@@ -3,7 +3,7 @@
 @section('content')
     <div class="grid gap-8 lg:grid-cols-12 lg:items-start">
         <div class="lg:col-span-7">
-            <div class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div class="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
                 <div class="inline-flex items-center gap-2 rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
                     RSVP • Đăng ký tham dự
                 </div>
@@ -44,7 +44,7 @@
         </div>
 
         <div class="lg:col-span-5">
-            <div class="rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm">
+            <div class="rounded-xl border border-neutral-200 bg-white p-6 shadow-sm">
                 <div class="text-sm font-semibold">Bạn sẽ làm được gì?</div>
                 <ul class="mt-3 space-y-3 text-sm text-neutral-700">
                     <li class="flex gap-3">

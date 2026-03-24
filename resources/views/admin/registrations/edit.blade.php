@@ -127,10 +127,10 @@
             </div>
 
             <div class="flex items-center gap-4 pt-2">
-                <button class="rounded-2xl bg-neutral-900 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800">
+                <button class="rounded-xl bg-neutral-900 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800">
                     Lưu thay đổi
                 </button>
-                <a href="{{ url('/admin/registrations') }}" class="rounded-2xl border border-neutral-300 px-5 py-3 text-sm font-semibold text-neutral-700 hover:bg-neutral-50">
+                <a href="{{ url('/admin/registrations') }}" class="rounded-xl border border-neutral-300 px-5 py-3 text-sm font-semibold text-neutral-700 hover:bg-neutral-50">
                     Hủy
                 </a>
             </div>
@@ -144,7 +144,7 @@
                     @csrf
                     <button
                         type="submit"
-                        class="rounded-2xl border border-red-300 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 hover:bg-red-100"
+                        class="rounded-xl border border-red-300 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 hover:bg-red-100"
                         onclick="return confirm('Bạn có chắc muốn hủy đăng ký này?')"
                     >
                         Hủy đăng ký
@@ -161,7 +161,7 @@
                 @method('delete')
                 <button
                     type="submit"
-                    class="rounded-2xl border border-red-600 bg-red-700 px-5 py-3 text-sm font-semibold text-white hover:bg-red-800"
+                    class="rounded-xl border border-red-600 bg-red-700 px-5 py-3 text-sm font-semibold text-white hover:bg-red-800"
                     onclick="return confirm('Bạn có chắc muốn xóa vĩnh viễn đăng ký này? Hành động này không thể hoàn tác.')"
                 >
                     Xóa vĩnh viễn

@@ -36,7 +36,7 @@
         </form>
 
         <!-- Collapsible Accordion Sections -->
-        <div class="border border-outline-variant/30 rounded-2xl bg-white overflow-hidden shadow-sm">
+        <div class="border border-outline-variant/30 rounded-xl bg-white overflow-hidden shadow-sm">
             
             <!-- Slideshow Template (Mẫu lịch chiếu) Section -->
             <div class="border-b border-outline-variant/30">
