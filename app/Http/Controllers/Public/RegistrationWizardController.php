@@ -68,9 +68,9 @@ class RegistrationWizardController extends Controller
             $now = Carbon::now(self::EVENT_TZ);
 
             $thisWeekStart = $now->copy()->startOfWeek(Carbon::MONDAY);
-            $thisWeekEnd   = $now->copy()->endOfWeek(Carbon::SUNDAY);
+            $thisWeekEnd = $now->copy()->endOfWeek(Carbon::SUNDAY);
             $nextWeekStart = $thisWeekStart->copy()->addWeek();
-            $nextWeekEnd   = $thisWeekEnd->copy()->addWeek();
+            $nextWeekEnd = $thisWeekEnd->copy()->addWeek();
 
             // Show all sessions in the two-week window that:
             //   1. Have not started yet (starts_at > now)
@@ -82,12 +82,27 @@ class RegistrationWizardController extends Controller
                 ->whereBetween('starts_at', [$thisWeekStart, $nextWeekEnd])
                 ->orderBy('starts_at')
                 ->get();
+
+            // Auto-select the first valid session if none is selected or selected is invalid
+            $selectedSessionId = $draft['event_session_id'] ?? null;
+            $selectedSession = $selectedSessionId ? $sessions->firstWhere('id', $selectedSessionId) : null;
+
+            if (!$selectedSession || $selectedSession->isPaused() || ($selectedSession->capacity_total - $selectedSession->capacity_reserved) <= 0) {
+                $firstValidSession = $sessions->first(function ($s) {
+                    return !$s->isPaused() && ($s->capacity_total - $s->capacity_reserved) > 0;
+                });
+
+                if ($firstValidSession) {
+                    $draft['event_session_id'] = $firstValidSession->id;
+                    Session::put(self::DRAFT_KEY, $draft);
+                }
+            }
         }
 
         return view('public.register.step1', [
-            'venues'   => $venues,
+            'venues' => $venues,
             'sessions' => $sessions,
-            'draft'    => $draft,
+            'draft' => $draft,
         ]);
     }
 
@@ -99,7 +114,7 @@ class RegistrationWizardController extends Controller
         $venueIds = Venue::query()->pluck('id')->all();
 
         $data = $request->validate([
-            'venue_id'         => ['required', Rule::in($venueIds)],
+            'venue_id' => ['required', Rule::in($venueIds)],
             'event_session_id' => ['required', 'integer'],
         ]);
 
@@ -134,7 +149,7 @@ class RegistrationWizardController extends Controller
         }
 
         $draft = Session::get(self::DRAFT_KEY, []);
-        $draft['venue_id']         = (int) $data['venue_id'];
+        $draft['venue_id'] = (int) $data['venue_id'];
         $draft['event_session_id'] = (int) $data['event_session_id'];
 
         Session::put(self::DRAFT_KEY, $draft);
@@ -156,17 +171,23 @@ class RegistrationWizardController extends Controller
 
     public function postStep2(Request $request)
     {
-        $data = $request->validate([
-            'full_name'        => ['required', 'string', 'max:255'],
-            'email'            => ['required', 'email', 'max:255'],
-            'phone_country'    => ['nullable', 'string', 'max:8'],
-            'phone_number'     => ['nullable', 'string', 'max:32'],
-            'attend_with_guest' => ['nullable', 'boolean'],
-        ]);
+        $data = $request->validate(
+            [
+                'full_name' => ['required', 'string', 'max:255'],
+                'email' => ['nullable', 'email', 'max:255'],
+                'phone_country' => ['required', 'string', 'max:8'],
+                'phone_number' => ['required', 'string', 'regex:/^[0-9]{9,11}$/'],
+                'attend_with_guest' => ['nullable', 'boolean'],
+            ],
+            [
+                'phone_number.regex' => 'Số điện thoại không hợp lệ.',
+            ]
+        );
 
-        $phone   = null;
+        $phone = null;
         $country = trim((string) ($data['phone_country'] ?? ''));
-        $number  = preg_replace('/\D+/', '', (string) ($data['phone_number'] ?? ''));
+        $number = preg_replace('/\D+/', '', (string) ($data['phone_number'] ?? ''));
+        $number = ltrim($number, '0');
         if ($number !== '') {
             $country = $country !== '' ? $country : '+84';
             if (!str_starts_with($country, '+')) {
@@ -177,9 +198,9 @@ class RegistrationWizardController extends Controller
 
         $draft = Session::get(self::DRAFT_KEY, []);
         $draft = array_merge($draft, [
-            'full_name'        => $data['full_name'],
-            'email'            => $data['email'],
-            'phone'            => $phone,
+            'full_name' => $data['full_name'],
+            'email' => $data['email'],
+            'phone' => $phone,
             'attend_with_guest' => (bool) ($data['attend_with_guest'] ?? false),
         ]);
         Session::put(self::DRAFT_KEY, $draft);
@@ -199,13 +220,13 @@ class RegistrationWizardController extends Controller
     public function postStep3(Request $request)
     {
         $data = $request->validate([
-            'adult_count'   => ['required', 'integer', 'min:0', 'max:999'],
-            'ntl_count'     => ['required', 'integer', 'min:0', 'max:999'],
+            'adult_count' => ['required', 'integer', 'min:0', 'max:999'],
+            'ntl_count' => ['required', 'integer', 'min:0', 'max:999'],
             'ntl_new_count' => ['required', 'integer', 'min:0', 'max:999'],
-            'child_count'   => ['required', 'integer', 'min:0', 'max:999'],
+            'child_count' => ['required', 'integer', 'min:0', 'max:999'],
         ]);
 
-        $draft           = Session::get(self::DRAFT_KEY, []);
+        $draft = Session::get(self::DRAFT_KEY, []);
         $attendWithGuest = (bool) ($draft['attend_with_guest'] ?? false);
 
         $guestTotal =
@@ -216,7 +237,7 @@ class RegistrationWizardController extends Controller
 
         if ($guestTotal <= 0) {
             throw ValidationException::withMessages([
-                'adult_count' => 'Tổng số khách phải lớn hơn 0.',
+                'adult_count' => 'Vui lòng nhập số lượng khách!',
             ]);
         }
 
@@ -226,10 +247,10 @@ class RegistrationWizardController extends Controller
             ]);
         }
 
-        $total = $guestTotal + ($attendWithGuest ? 1 : 0);
+        // $total = $guestTotal + ($attendWithGuest ? 1 : 0);
 
         $draft = array_merge($draft, $data);
-        $draft['total_count'] = $total;
+        $draft['total_count'] = $guestTotal;
         Session::put(self::DRAFT_KEY, $draft);
 
         return redirect()->to('/register/step4');
@@ -237,18 +258,18 @@ class RegistrationWizardController extends Controller
 
     public function step4()
     {
-        $draft   = Session::get(self::DRAFT_KEY, []);
+        $draft = Session::get(self::DRAFT_KEY, []);
         $session = null;
-        $venue   = null;
+        $venue = null;
 
         if (!empty($draft['event_session_id'])) {
             $session = EventSession::query()->with('venue')->find($draft['event_session_id']);
-            $venue   = $session?->venue;
+            $venue = $session?->venue;
         }
 
         return view('public.register.step4', [
-            'draft'   => $draft,
-            'venue'   => $venue,
+            'draft' => $draft,
+            'venue' => $venue,
             'session' => $session,
         ]);
     }
@@ -258,8 +279,8 @@ class RegistrationWizardController extends Controller
     // =========================================================================
     public function submit()
     {
-        $draft    = Session::get(self::DRAFT_KEY, []);
-        $required = ['venue_id', 'event_session_id', 'full_name', 'email', 'adult_count', 'ntl_count', 'ntl_new_count', 'child_count', 'total_count'];
+        $draft = Session::get(self::DRAFT_KEY, []);
+        $required = ['venue_id', 'event_session_id', 'full_name', 'phone', 'adult_count', 'ntl_count', 'ntl_new_count', 'child_count', 'total_count'];
 
         foreach ($required as $key) {
             if (!array_key_exists($key, $draft)) {
@@ -295,15 +316,15 @@ class RegistrationWizardController extends Controller
             $session->capacity_reserved = $newReserved;
 
             return Registration::query()->create([
-                'event_session_id'  => $session->id,
-                'full_name'         => $draft['full_name'],
-                'email'             => $draft['email'],
-                'phone'             => $draft['phone'] ?? null,
-                'adult_count'       => (int) $draft['adult_count'],
-                'ntl_count'         => (int) $draft['ntl_count'],
-                'ntl_new_count'     => (int) $draft['ntl_new_count'],
-                'child_count'       => (int) $draft['child_count'],
-                'total_count'       => (int) $draft['total_count'],
+                'event_session_id' => $session->id,
+                'full_name' => $draft['full_name'],
+                'email' => $draft['email'] ?? null,
+                'phone' => $draft['phone'] ?? null,
+                'adult_count' => (int) $draft['adult_count'],
+                'ntl_count' => (int) $draft['ntl_count'],
+                'ntl_new_count' => (int) $draft['ntl_new_count'],
+                'child_count' => (int) $draft['child_count'],
+                'total_count' => (int) $draft['total_count'],
                 'attend_with_guest' => (bool) ($draft['attend_with_guest'] ?? false),
             ]);
         });
@@ -313,7 +334,9 @@ class RegistrationWizardController extends Controller
         }
 
         $registration->load('eventSession.venue');
-        Mail::to($registration->email)->send(new RegistrationConfirmed($registration));
+        if ($registration->email) {
+            Mail::to($registration->email)->send(new RegistrationConfirmed($registration));
+        }
 
         Session::forget(self::DRAFT_KEY);
 

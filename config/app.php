@@ -14,7 +14,7 @@ return [
     */
 
     // Force app display name (header/title/email signature, etc.)
-    'name' => 'THƯ MỜI',
+    'name' => 'ĐĂNG KÝ',
 
     /*
     |--------------------------------------------------------------------------

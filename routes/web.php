@@ -31,6 +31,9 @@ Route::middleware(['guest.authed'])->group(function () {
     Route::post('/register/step3', [RegistrationWizardController::class, 'postStep3']);
 
     Route::get('/register/step4', [RegistrationWizardController::class, 'step4']);
+    Route::get('/register/submit', function () {
+        return redirect()->to('/register/step4');
+    });
     Route::post('/register/submit', [RegistrationWizardController::class, 'submit']);
 
     Route::get('/register/success/{id}', [RegistrationWizardController::class, 'success'])

@@ -273,13 +273,17 @@ class RegistrationController extends Controller
         $data = $request->validate([
             'full_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:32'],
+            'phone' => ['nullable', 'string', 'regex:/^[0-9]{9,11}$/'],
             'event_session_id' => ['required', 'exists:event_sessions,id'],
             'adult_count' => ['required', 'integer', 'min:0', 'max:999'],
             'ntl_count' => ['required', 'integer', 'min:0', 'max:999'],
             'ntl_new_count' => ['required', 'integer', 'min:0', 'max:999'],
             'child_count' => ['required', 'integer', 'min:0', 'max:999'],
         ]);
+
+        if (!empty($data['phone'])) {
+            $data['phone'] = ltrim(preg_replace('/\D+/', '', (string)$data['phone']), '0');
+        }
 
         $oldSessionId = $registration->event_session_id;
         $oldTotalCount = $registration->total_count;

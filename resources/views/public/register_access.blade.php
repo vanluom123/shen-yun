@@ -5,7 +5,7 @@
         <div class="rsvp-heading">Mở khoá đăng ký</div>
     </div>
 
-    <form method="post" action="{{ url('/login') }}" class="mx-auto mt-6 w-full max-w-sm space-y-4">
+    <form method="post" action="{{ url('/login') }}" class="mx-auto mt-6 w-full max-w-sm space-y-4" novalidate>
         @csrf
 
         <div>
@@ -17,7 +17,7 @@
                     type="password"
                     autocomplete="current-password"
                     required
-                    class="rsvp-input mt-0 pr-16"
+                    class="rsvp-input mt-0 pr-16 @error('password') is-invalid @enderror"
                 />
                 <button
                     type="button"
@@ -29,7 +29,7 @@
             </div>
         </div>
 
-        <button type="submit" class="btn-gold w-full">
+        <button type="submit" class="btn btn-gold w-full">
             TIẾP TỤC
         </button>
 
