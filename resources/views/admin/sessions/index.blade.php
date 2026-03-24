@@ -12,7 +12,7 @@
                 <button
                     type="button"
                     id="delete-selected"
-                    class="px-6 py-2.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-full text-sm font-bold active:scale-95 transition-all hidden items-center gap-2"
+                    class="px-6 py-2.5 bg-rose-50 text-rose-700 border border-rose-200 rounded-xl text-sm font-bold active:scale-95 transition-all hidden items-center gap-2"
                     onclick="confirmBulkDelete()"
                 >
                     <span class="material-symbols-outlined text-sm">delete_sweep</span>
@@ -168,12 +168,12 @@
                                             <td>
                                                 <div class="flex items-center gap-2">
                                                     <span class="text-sm font-medium">{{ $s->capacity_reserved }} / {{ $s->capacity_total }}</span>
-                                                    <span class="text-xs px-2 py-0.5 bg-surface-container rounded-full text-on-surface-variant">Còn {{ $remaining }}</span>
+                                                    <span class="text-xs px-2 py-0.5 bg-surface-container rounded-xl text-on-surface-variant">Còn {{ $remaining }}</span>
                                                 </div>
                                             </td>
                                             <td>
                                                 <span class="badge-status {{ $style }}">
-                                                    <span class="w-1.5 h-1.5 rounded-full {{ $dot }} mr-2"></span>
+                                                    <span class="w-1.5 h-1.5 rounded-xl {{ $dot }} mr-2"></span>
                                                     {{ $label }}
                                                 </span>
                                             </td>

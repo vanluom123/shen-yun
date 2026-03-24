@@ -40,15 +40,23 @@
         </body>
     @elseif ($isAdmin)
         <body class="min-h-dvh bg-background text-on-surface antialiased font-sans">
-            <div class="flex min-h-dvh flex-col lg:flex-row relative">
+            <div id="admin-layout" class="flex min-h-dvh flex-col lg:flex-row relative">
                 <!-- Mobile Backdrop -->
                 <div id="mobile-backdrop" class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity duration-300 opacity-0 lg:hidden"></div>
 
                 <!-- Sidebar -->
-                <aside id="admin-sidebar" class="fixed inset-y-0 left-0 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out lg:fixed lg:translate-x-0 w-[280px] lg:w-64 bg-slate-50 border-r border-outline-variant/20 flex flex-col p-4 shadow-xl lg:shadow-none h-dvh">
-                    <div class="px-2 py-6 mb-4">
-                        <h2 class="text-xl font-bold tracking-tight text-on-surface">{{ $appTitle }}</h2>
-                        <p class="text-xs text-on-surface-variant opacity-70 font-medium uppercase tracking-widest mt-1">Admin Space</p>
+                <aside id="admin-sidebar" class="fixed inset-y-0 left-0 z-50 transform -translate-x-full transition-all duration-300 ease-in-out lg:fixed lg:translate-x-0 w-[280px] lg:w-64 bg-slate-50 border-r border-outline-variant/20 flex flex-col p-4 shadow-xl lg:shadow-none h-dvh overflow-hidden">
+                    <div class="sidebar-header px-2 mb-4 whitespace-nowrap overflow-hidden relative">
+                        <div class="flex items-center justify-between">
+                            <a href="{{ url('/admin') }}" class="flex flex-col items-center sidebar-brand group">
+                                <img src="{{ asset('shen-yun.webp') }}" alt="Logo" class="logo-img h-16 w-16 rounded-full object-cover border-2 border-outline-variant/30 group-hover:border-primary/50 transition-colors">
+                                <p class="text-xs text-on-surface-variant opacity-70 font-medium uppercase tracking-widest mt-2 group-hover:text-primary transition-colors">Admin Space</p>
+                            </a>
+                            <!-- Desktop Collapse Toggle -->
+                            <button id="desktop-sidebar-toggle" class="hidden lg:block lg:flex p-2 text-on-surface-variant hover:text-on-surface focus:outline-none items-center justify-center w-10 h-10 rounded-xl hover:bg-surface-container-high transition-colors">
+                                <span class="material-symbols-outlined transition-transform duration-300">menu_open</span>
+                            </button>
+                        </div>
                     </div>
                     
                     <nav class="flex-1 space-y-1">
@@ -58,33 +66,81 @@
                     <div class="mt-auto pt-4 border-t border-outline-variant/30">
                          <form method="post" action="{{ url('/admin/logout') }}">
                             @csrf
-                            <button class="flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface rounded-xl transition-all group">
+                            <button class="flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface rounded-xl transition-all group overflow-hidden whitespace-nowrap">
                                 <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">logout</span>
-                                <span>Đăng xuất</span>
+                                <span class="sidebar-text">Đăng xuất</span>
                             </button>
                         </form>
                     </div>
                 </aside>
 
                 <!-- Main Area -->
-                <div class="flex-1 flex flex-col min-w-0 lg:ml-64">
-                    <header class="h-16 bg-white/80 backdrop-blur-md border-b border-outline-variant/20 flex items-center justify-between px-4 sm:px-8 sticky top-0 z-30">
-                        <div class="flex items-center gap-3">
-                            <button id="mobile-menu-toggle" class="lg:hidden p-2 -ml-2 text-on-surface-variant hover:text-on-surface focus:outline-none flex flex-col justify-center items-center w-10 h-10 relative">
+                <div id="main-content" class="flex-1 flex flex-col min-w-0 lg:ml-64 transition-all duration-300">
+                    <header class="h-16 bg-white/80 backdrop-blur-md border-b border-outline-variant/20 flex items-center px-4 sm:px-8 sticky top-0 z-30">
+                        <div class="flex items-center w-full relative">
+                            <button id="mobile-menu-toggle" class="lg:hidden p-2 -ml-2 text-on-surface-variant hover:text-on-surface focus:outline-none flex flex-col justify-center items-center w-10 h-10 relative z-10">
                                 <span class="block w-5 h-0.5 bg-current transition-all duration-300 ease-in-out absolute top-[14px]"></span>
                                 <span class="block w-5 h-0.5 bg-current transition-all duration-300 ease-in-out absolute top-[19px]"></span>
                                 <span class="block w-5 h-0.5 bg-current transition-all duration-300 ease-in-out absolute bottom-[14px]"></span>
                             </button>
-                            <span class="lg:hidden font-bold tracking-tight text-on-surface text-base">THƯ MỜI - ADMIN SPACE</span>
+                            
+                            <div class="lg:hidden absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <a href="{{ url('/admin') }}" class="pointer-events-auto">
+                                    <img src="{{ asset('shen-yun.webp') }}" alt="Logo" class="h-13 w-13 rounded-full object-cover border border-outline-variant/30">
+                                </a>
+                            </div>
+
                             <div class="hidden lg:block">
-                                <span class="text-sm font-semibold text-on-surface-variant/60">Quản lý</span>
+                                <a href="{{ url('/admin') }}" class="text-sm font-semibold text-on-surface-variant/60 hover:text-primary underline transition-colors">Quản lý</a>
                                 <span class="mx-1 text-on-surface-variant/30">/</span>
                                 <span class="text-sm font-bold text-on-surface">{{ $title ?? 'Dashboard' }}</span>
                             </div>
                         </div>
                     </header>
 
-                    <main class="flex-1 p-5 sm:p-10">
+                    <style>
+                        @media (min-width: 1024px) {
+                            .sidebar-collapsed #admin-sidebar {
+                                width: 80px !important;
+                            }
+                            .sidebar-collapsed #admin-sidebar .sidebar-header {
+                                padding-left: 0 !important;
+                                padding-right: 0 !important;
+                                text-align: center !important;
+                                justify-content: center !important;
+                            }
+                            .sidebar-collapsed #admin-sidebar .sidebar-brand,
+                            .sidebar-collapsed #admin-sidebar .sidebar-text {
+                                display: none !important;
+                            }
+                            .sidebar-collapsed #admin-sidebar .sidebar-header .flex {
+                                justify-content: center !important;
+                            }
+                            .sidebar-collapsed #main-content {
+                                margin-left: 80px !important;
+                            }
+                            .sidebar-collapsed #desktop-sidebar-toggle span {
+                                transform: rotate(180deg);
+                            }
+                            .sidebar-collapsed #admin-sidebar nav a,
+                            .sidebar-collapsed #admin-sidebar .mt-auto button {
+                                justify-content: center !important;
+                                padding-left: 0 !important;
+                                padding-right: 0 !important;
+                                gap: 0 !important;
+                            }
+                            .sidebar-collapsed #admin-sidebar nav a span.material-symbols-outlined {
+                                margin: 0 !important;
+                            }
+                        }
+                        
+                        /* Ensure transitions are smooth */
+                        #admin-sidebar, #main-content {
+                            transition: all 0.3s ease-in-out !important;
+                        }
+                    </style>
+
+                    <main class="flex-1 p-5">
                         @if (session('status'))
                             <div class="mb-6 rounded-xl border border-emerald-200/60 bg-emerald-50/90 px-4 py-3 text-emerald-900 shadow-sm">
                                 {{ session('status') }}
@@ -115,45 +171,64 @@
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     const toggleBtn = document.getElementById('mobile-menu-toggle');
+                    const desktopToggleBtn = document.getElementById('desktop-sidebar-toggle');
                     const sidebar = document.getElementById('admin-sidebar');
                     const backdrop = document.getElementById('mobile-backdrop');
+                    const adminLayout = document.getElementById('admin-layout');
                     
-                    if (!toggleBtn || !sidebar || !backdrop) return;
-                    
-                    const topBar = toggleBtn.querySelector('span:nth-child(1)');
-                    const middleBar = toggleBtn.querySelector('span:nth-child(2)');
-                    const bottomBar = toggleBtn.querySelector('span:nth-child(3)');
+                    if (!sidebar || !backdrop || !adminLayout) return;
 
-                    function toggleMenu() {
-                        const isOpen = !sidebar.classList.contains('-translate-x-full');
-                        
-                        if (isOpen) {
-                            // Close
-                            sidebar.classList.add('-translate-x-full');
-                            backdrop.classList.add('opacity-0');
-                            setTimeout(() => backdrop.classList.add('hidden'), 300);
-                            
-                            // Animate hamburger back to 3 lines
-                            topBar.style.transform = 'none';
-                            middleBar.style.opacity = '1';
-                            bottomBar.style.transform = 'none';
-                        } else {
-                            // Open
-                            sidebar.classList.remove('-translate-x-full');
-                            backdrop.classList.remove('hidden');
-                            // Trigger reflow UI sync
-                            void backdrop.offsetWidth;
-                            backdrop.classList.remove('opacity-0');
-                            
-                            // Animate to X (distance between top/bottom and center)
-                            topBar.style.transform = 'translateY(5px) rotate(45deg)';
-                            middleBar.style.opacity = '0';
-                            bottomBar.style.transform = 'translateY(-5px) rotate(-45deg)';
-                        }
+                    // Initialize Desktop Sidebar State
+                    const isCollapsed = localStorage.getItem('admin_sidebar_collapsed') === 'true';
+                    if (isCollapsed && window.innerWidth >= 1024) {
+                        adminLayout.classList.add('sidebar-collapsed');
                     }
 
-                    toggleBtn.addEventListener('click', toggleMenu);
-                    backdrop.addEventListener('click', toggleMenu);
+                    // Desktop Toggle
+                    if (desktopToggleBtn) {
+                        desktopToggleBtn.addEventListener('click', () => {
+                            adminLayout.classList.toggle('sidebar-collapsed');
+                            localStorage.setItem('admin_sidebar_collapsed', adminLayout.classList.contains('sidebar-collapsed'));
+                        });
+                    }
+                    
+                    if (toggleBtn) {
+                        const topBar = toggleBtn.querySelector('span:nth-child(1)');
+                        const middleBar = toggleBtn.querySelector('span:nth-child(2)');
+                        const bottomBar = toggleBtn.querySelector('span:nth-child(3)');
+
+                        function toggleMenu() {
+                            const isOpen = !sidebar.classList.contains('-translate-x-full');
+                            
+                            if (isOpen) {
+                                // Close
+                                sidebar.classList.add('-translate-x-full');
+                                backdrop.classList.add('opacity-0');
+                                setTimeout(() => backdrop.classList.add('hidden'), 300);
+                                
+                                if (topBar) {
+                                    topBar.style.transform = 'none';
+                                    middleBar.style.opacity = '1';
+                                    bottomBar.style.transform = 'none';
+                                }
+                            } else {
+                                // Open
+                                sidebar.classList.remove('-translate-x-full');
+                                backdrop.classList.remove('hidden');
+                                void backdrop.offsetWidth;
+                                backdrop.classList.remove('opacity-0');
+                                
+                                if (topBar) {
+                                    topBar.style.transform = 'translateY(5px) rotate(45deg)';
+                                    middleBar.style.opacity = '0';
+                                    bottomBar.style.transform = 'translateY(-5px) rotate(-45deg)';
+                                }
+                            }
+                        }
+
+                        toggleBtn.addEventListener('click', toggleMenu);
+                        backdrop.addEventListener('click', toggleMenu);
+                    }
                 });
             </script>
         </body>

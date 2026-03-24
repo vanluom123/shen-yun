@@ -17,7 +17,7 @@
                     $done = ($currentStep ?? 1) > $num;
                 @endphp
                 <div class="flex flex-col items-center gap-2">
-                    <div class="flex h-10 w-10 items-center justify-center rounded-full border text-sm font-semibold {{ $active ? 'border-[#d9b76f]/70 bg-[#d9b76f] text-black' : ($done ? 'border-[#d9b76f]/60 bg-[#3d453d] text-[#f3e2b6]' : 'border-[#d9b76f]/25 bg-[#3d453d] text-neutral-200') }}"
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl border text-sm font-semibold {{ $active ? 'border-[#d9b76f]/70 bg-[#d9b76f] text-black' : ($done ? 'border-[#d9b76f]/60 bg-[#3d453d] text-[#f3e2b6]' : 'border-[#d9b76f]/25 bg-[#3d453d] text-neutral-200') }}"
                         title="{{ $label }}">
                         @if ($done)
                             ✓

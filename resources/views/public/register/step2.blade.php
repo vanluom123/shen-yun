@@ -54,7 +54,7 @@
             <span
                 class="toggle-switch relative inline-flex h-8 w-13 items-center rounded-3xl border border-neutral-500/40 px-1 peer-checked:bg-[#d9b76f]">
                 <input type="checkbox" name="attend_with_guest" value="1" class="peer sr-only" {{ old('attend_with_guest', $draft['attend_with_guest'] ?? false) ? 'checked' : '' }} />
-                <span class="h-6 w-6 z-10 rounded-full bg-neutral-200 transition peer-checked:translate-x-5"></span>
+                <span class="h-6 w-6 z-10 rounded-xl bg-neutral-200 transition peer-checked:translate-x-5"></span>
                 <span
                     class="absolute top-0 left-0 h-8 w-13 items-center rounded-3xl border border-neutral-500/40 bg-white/30 px-1 peer-checked:bg-[#d9b76f]"></span>
             </span>

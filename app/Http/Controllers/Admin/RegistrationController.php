@@ -27,17 +27,37 @@ class RegistrationController extends Controller
     public function index(Request $request)
     {
         $query = Registration::query()
+            ->join('event_sessions', 'registrations.event_session_id', '=', 'event_sessions.id')
+            ->select('registrations.*')
             ->with('eventSession.venue')
-            ->orderByDesc('created_at');
+            ->orderByDesc('event_sessions.starts_at');
 
         $status = $request->query('status');
         if ($status && in_array($status, ['confirmed', 'cancelled'])) {
-            $query->where('status', $status);
+            $query->where('registrations.status', $status);
         }
 
         $sessionId = $request->query('session_id');
         if ($sessionId) {
-            $query->where('event_session_id', $sessionId);
+            $query->where('registrations.event_session_id', $sessionId);
+        }
+
+        $phone = $request->query('phone');
+        if ($phone) {
+            $query->where(function($q) use ($phone) {
+                $q->where('registrations.phone', 'like', "%{$phone}%");
+                
+                // If starts with 0, also search for +84
+                if (str_starts_with($phone, '0')) {
+                    $alt = '+84' . substr($phone, 1);
+                    $q->orWhere('registrations.phone', 'like', "%{$alt}%");
+                } 
+                // If starts with +84, also search for 0
+                elseif (str_starts_with($phone, '+84')) {
+                    $alt = '0' . substr($phone, 3);
+                    $q->orWhere('registrations.phone', 'like', "%{$alt}%");
+                }
+            });
         }
 
         $regs = $query->paginate(30)->withQueryString();
@@ -51,6 +71,7 @@ class RegistrationController extends Controller
             'registrations' => $regs,
             'statusFilter' => $status,
             'sessionIdFilter' => $sessionId,
+            'phoneFilter' => $phone,
             'sessions' => $sessions,
         ]);
     }
@@ -58,18 +79,36 @@ class RegistrationController extends Controller
     public function exportCsv(Request $request): StreamedResponse
     {
         $query = Registration::query()
+            ->join('event_sessions', 'registrations.event_session_id', '=', 'event_sessions.id')
+            ->select('registrations.*')
             ->with('eventSession.venue')
-            ->orderBy('created_at');
+            ->orderByDesc('event_sessions.starts_at');
 
         $status = $request->query('status');
         if ($status && in_array($status, ['confirmed', 'cancelled'])) {
-            $query->where('status', $status);
+            $query->where('registrations.status', $status);
         }
 
         $sessionId = $request->query('session_id');
         if ($sessionId) {
-            $query->where('event_session_id', $sessionId);
+            $query->where('registrations.event_session_id', $sessionId);
         }
+
+        $phone = $request->query('phone');
+        if ($phone) {
+            $query->where(function($q) use ($phone) {
+                $q->where('registrations.phone', 'like', "%{$phone}%");
+                
+                if (str_starts_with($phone, '0')) {
+                    $alt = '+84' . substr($phone, 1);
+                    $q->orWhere('registrations.phone', 'like', "%{$alt}%");
+                } elseif (str_starts_with($phone, '+84')) {
+                    $alt = '0' . substr($phone, 3);
+                    $q->orWhere('registrations.phone', 'like', "%{$alt}%");
+                }
+            });
+        }
+
         $filename = 'registrations.csv';
 
         return response()->streamDownload(function () use ($query) {
@@ -150,17 +189,34 @@ class RegistrationController extends Controller
     public function exportXls(Request $request): StreamedResponse
     {
         $query = Registration::query()
+            ->join('event_sessions', 'registrations.event_session_id', '=', 'event_sessions.id')
+            ->select('registrations.*')
             ->with('eventSession.venue')
-            ->orderBy('created_at');
+            ->orderByDesc('event_sessions.starts_at');
 
         $status = $request->query('status');
         if ($status && in_array($status, ['confirmed', 'cancelled'])) {
-            $query->where('status', $status);
+            $query->where('registrations.status', $status);
         }
 
         $sessionId = $request->query('session_id');
         if ($sessionId) {
-            $query->where('event_session_id', $sessionId);
+            $query->where('registrations.event_session_id', $sessionId);
+        }
+
+        $phone = $request->query('phone');
+        if ($phone) {
+            $query->where(function($q) use ($phone) {
+                $q->where('registrations.phone', 'like', "%{$phone}%");
+                
+                if (str_starts_with($phone, '0')) {
+                    $alt = '+84' . substr($phone, 1);
+                    $q->orWhere('registrations.phone', 'like', "%{$alt}%");
+                } elseif (str_starts_with($phone, '+84')) {
+                    $alt = '0' . substr($phone, 3);
+                    $q->orWhere('registrations.phone', 'like', "%{$alt}%");
+                }
+            });
         }
 
         $filename = 'registrations.xls';
