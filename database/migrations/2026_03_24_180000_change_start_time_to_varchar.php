@@ -9,11 +9,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        DB::statement('ALTER TABLE template_slots ALTER COLUMN start_time TYPE varchar(10)');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE template_slots ALTER COLUMN start_time TYPE varchar(10)');
+        } else {
+            Schema::table('template_slots', function (Blueprint $table) {
+                $table->string('start_time', 10)->change();
+            });
+        }
     }
 
     public function down(): void
     {
-        DB::statement('ALTER TABLE template_slots ALTER COLUMN start_time TYPE time');
+        if (DB::getDriverName() === 'pgsql') {
+            DB::statement('ALTER TABLE template_slots ALTER COLUMN start_time TYPE time');
+        }
     }
 };

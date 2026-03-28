@@ -25,7 +25,7 @@
             <div class="rsvp-shell">
                 <div class="rsvp-top">
                     <div class="rsvp-title">{{ $appTitle }}</div>
-                    <div class="rsvp-subtitle">Trải nghiệm hành trình âm nhạc &amp; vũ đạo thư giãn cuối tuần</div>
+                    <div class="rsvp-subtitle">Trải nghiệm hành trình âm nhạc &amp; vũ đạo thuần chính</div>
                 </div>
 
                 <main class="pb-12">
