@@ -7,12 +7,32 @@
 
         <title>{{ $title ?? config('app.name', 'Phong trà') }}</title>
 
+        <link rel="icon" id="favicon" type="image/webp" href="{{ asset('shen-yun.webp') }}">
+
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script>
+            (function() {
+                const img = new Image();
+                img.src = '{{ asset('shen-yun.webp') }}';
+                img.onload = function() {
+                    const size = 64;
+                    const canvas = document.createElement('canvas');
+                    canvas.width = canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+                    ctx.beginPath();
+                    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+                    ctx.closePath();
+                    ctx.clip();
+                    ctx.drawImage(img, 0, 0, size, size);
+                    document.getElementById('favicon').href = canvas.toDataURL('image/png');
+                };
+            })();
+        </script>
     </head>
     @php
         $isRegisterFlow = request()->is('register*') || request()->is('login');
