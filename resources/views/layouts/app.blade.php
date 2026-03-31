@@ -58,6 +58,15 @@
 
                     </div>
                 </main>
+
+                <footer class="text-center text-xs text-neutral-100/30">
+                    <div class="pt-4">
+                        <p class="flex items-center justify-center mb-2">
+                            <span class="material-symbols-outlined text-base text-neutral-100/20">music_note</span>
+                        </p>
+                    © 2026 Phòng Trà VinHomes Q9
+                </div>
+                </footer>
             </div>
             <x-floating-contact-widget />
         </body>
@@ -87,13 +96,7 @@
                     </nav>
 
                     <div class="mt-auto pt-4 border-t border-outline-variant/30">
-                         <form method="post" action="{{ url('/admin/logout') }}">
-                            @csrf
-                            <button class="cursor-pointer flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface rounded-xl transition-all group overflow-hidden whitespace-nowrap">
-                                <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">logout</span>
-                                <span class="sidebar-text">Đăng xuất</span>
-                            </button>
-                        </form>
+                        <p class="sidebar-text text-center text-xs text-on-surface-variant/80">© 2026 Phòng Trà VinHomes Q9</p>
                     </div>
                 </aside>
 
@@ -163,7 +166,7 @@
                         }
                     </style>
 
-                    <main class="flex-1 p-5">
+                    <main class="p-2 sm:p-4 lg:p-5">
                         @if (session('status'))
                             <div class="mb-6 rounded-xl border border-emerald-200/60 bg-emerald-50/90 px-4 py-3 text-emerald-900 shadow-sm">
                                 {{ session('status') }}
@@ -185,9 +188,7 @@
                         @yield('content')
                     </main>
 
-                    <footer class="px-8 py-6 text-xs text-on-surface-variant/50 border-t border-outline-variant/10 bg-slate-50/50">
-                        © {{ date('Y') }} {{ $appTitle }} • Admin Dashboard v2.0
-                    </footer>
+
                 </div>
             </div>
 
@@ -293,8 +294,8 @@
                 </main>
 
                 <footer class="border-t border-white/20 bg-white/60 backdrop-blur-md">
-                    <div class="mx-auto max-w-6xl px-4 py-5 text-xs text-neutral-600">
-                        © {{ date('Y') }} {{ $appTitle }}
+                    <div class="mx-auto max-w-6xl px-4 py-5 text-xs text-neutral-600 text-center">
+                        © 2026 Phòng Trà VinHomes Q9
                     </div>
                 </footer>
             </div>

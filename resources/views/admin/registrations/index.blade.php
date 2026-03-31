@@ -7,7 +7,7 @@
         </div>
     @endif
 
-    <div class="rounded-3xl border border-white/25 bg-white/65 shadow-[0_16px_60px_rgba(0,0,0,0.18)] backdrop-blur-md">
+    <div class="register-list rounded-3xl border border-white/25 bg-white/65 shadow-[0_16px_60px_rgba(0,0,0,0.18)] backdrop-blur-md">
         <div class="px-5 sm:px-6 pt-5 sm:pt-6 pb-4">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                 <div>
@@ -97,9 +97,9 @@
             <div class="overflow-x-auto">
                 <table class="min-w-full w-full text-sm">
                 <thead class="bg-white/70 text-left text-xs font-semibold text-neutral-700">
-                    <tr class="[&>th]:px-5 [&>th]:py-4">
+                    <tr class="[&>th]:px-5 [&>th]:py-4 border-neutral-200/70 border-b">
                         <th class="w-20 pl-6">Mã</th>
-                        <th class="w-56">Người mời</th>
+                        <th class="w-56 bg-white sticky left-0 z-10 sticky-col">Người mời</th>
                         <th class="w-40">SĐT</th>
                         <th class="w-36">Trình chiếu</th>
                         <th class="w-24">Khách</th>
@@ -113,9 +113,9 @@
                 </thead>
                 <tbody class="divide-y divide-neutral-200/70">
                     @forelse ($registrations as $r)
-                        <tr class="hover:bg-black/3">
+                        <tr class="hover:bg-neutral-100 register-list__tr group">
                             <td class="pl-6 py-4 font-mono text-xs text-neutral-700">#{{ $r->id }}</td>
-                            <td class="px-5 py-4">
+                            <td class="px-5 py-4 sticky left-0 z-10 bg-white sticky-col">
                                 <a href="{{ url('/admin/registrations/'.$r->id.'/edit') }}" class="block min-h-[44px] min-w-[44px] flex items-center font-semibold text-neutral-900 hover:underline">
                                     {{ $r->full_name }}
                                 </a>
@@ -276,6 +276,34 @@
                 });
             });
         }
+
+        // Sticky column shadow on scroll
+        const scrollWrapper = document.querySelector('.overflow-x-auto');
+        if (scrollWrapper) {
+            scrollWrapper.addEventListener('scroll', () => {
+                const isScrolled = scrollWrapper.scrollLeft > 0;
+                document.querySelectorAll('.sticky-col').forEach(el => {
+                    el.classList.toggle('is-stuck', isScrolled);
+                });
+            });
+        }
     </script>
+
+    <style>
+        .sticky-col.is-stuck::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -8px;
+            width: 8px;
+            height: 100%;
+            background: linear-gradient(to right, rgba(0,0,0,0.08), transparent);
+            pointer-events: none;
+        }
+
+        tr:hover .sticky-col.is-stuck {
+            background-color: #f5f5f5 !important;
+        }
+    </style>
 @endsection
 
