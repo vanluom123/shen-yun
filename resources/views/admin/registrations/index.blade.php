@@ -16,36 +16,31 @@
                 </div>
 
                 <a
-                    href="{{ url('/admin/registrations/export.xls') }}?status={{ $statusFilter }}&session_id={{ $sessionIdFilter }}&phone={{ $phoneFilter }}"
+                    href="{{ url('/admin/registrations/export.xls') }}?status={{ $statusFilter }}&session_id={{ $sessionIdFilter }}&search={{ $searchFilter }}"
                     class="inline-flex items-center justify-center rounded-3xl bg-[#1a1a1a] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800"
                 >
                     Xuất Excel
                 </a>
             </div>
 
-            <div class="mt-5 flex flex-wrap items-center gap-3">
+            <div class="mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 <div class="relative">
-                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
-                        </svg>
-                    </div>
-                    <input
-                        type="text"
-                        id="phoneFilter"
-                        placeholder="Tìm số điện thoại..."
-                        value="{{ $phoneFilter ?? '' }}"
-                        class="w-auto min-w-[200px] rounded-xl border border-neutral-200 bg-white py-2 pl-9 pr-9 text-sm text-neutral-700 outline-none hover:bg-neutral-50 focus:border-neutral-300"
-                        onkeypress="if(event.key === 'Enter') applyFilters()"
-                    >
                     <button
                         onclick="applyFilters()"
-                        class="absolute inset-y-0 right-0 flex items-center pr-3 text-neutral-500 hover:text-neutral-800 cursor-pointer"
+                        class="absolute inset-y-0 left-0 flex items-center pl-3 text-neutral-500 hover:text-neutral-800 cursor-pointer"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
                         </svg>
                     </button>
+                    <input
+                        type="text"
+                        id="searchFilter"
+                        placeholder="Tìm SĐT hoặc người mời"
+                        value="{{ $searchFilter ?? '' }}"
+                        class="w-full rounded-xl border border-neutral-200 bg-white py-2 pl-9 pr-4 text-sm text-neutral-700 outline-none hover:bg-neutral-50 focus:border-neutral-300"
+                        oninput="applyFilters()"
+                    >
                 </div>
 
                 <div class="relative">
@@ -56,7 +51,7 @@
                     </div>
                     <select
                         id="sessionFilter"
-                        class="w-auto min-w-[200px] appearance-none rounded-xl border border-neutral-200 bg-white py-2 pl-9 pr-8 text-sm text-neutral-700 outline-none hover:bg-neutral-50 focus:border-neutral-300"
+                        class="w-full appearance-none rounded-xl border border-neutral-200 bg-white py-2 pl-9 pr-8 text-sm text-neutral-700 outline-none hover:bg-neutral-50 focus:border-neutral-300"
                         onchange="applyFilters()"
                     >
                         <option value="">Trình chiếu: Tất cả</option>
@@ -81,10 +76,11 @@
                     </div>
                     <select
                         id="statusFilter"
-                        class="w-auto min-w-[180px] appearance-none rounded-xl border border-neutral-200 bg-white py-2 pl-9 pr-8 text-sm text-neutral-700 outline-none hover:bg-neutral-50 focus:border-neutral-300"
+                        class="w-full appearance-none rounded-xl border border-neutral-200 bg-white py-2 pl-9 pr-8 text-sm text-neutral-700 outline-none hover:bg-neutral-50 focus:border-neutral-300"
                         onchange="applyFilters()"
                     >
                         <option value="" {{ empty($statusFilter) ? 'selected' : '' }}>Trạng thái: Tất cả</option>
+                        <option value="pending" {{ $statusFilter === 'pending' ? 'selected' : '' }}>Trạng thái: Chờ xác nhận</option>
                         <option value="confirmed" {{ $statusFilter === 'confirmed' ? 'selected' : '' }}>Trạng thái: Đã xác nhận</option>
                         <option value="cancelled" {{ $statusFilter === 'cancelled' ? 'selected' : '' }}>Trạng thái: Đã hủy</option>
                     </select>
@@ -105,7 +101,6 @@
                         <th class="w-20 pl-6">Mã</th>
                         <th class="w-56">Người mời</th>
                         <th class="w-40">SĐT</th>
-                        <th class="w-72">Gmail</th>
                         <th class="w-36">Trình chiếu</th>
                         <th class="w-24">Khách</th>
                         <th class="w-24">NTL</th>
@@ -113,7 +108,7 @@
                         <th class="w-24">Trẻ em</th>
                         <th class="w-24">Tổng</th>
                         <th class="w-24">Trạng thái</th>
-                        <th class="w-20 pr-6">Thao tác</th>
+                        <th class="w-24 pr-6">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-neutral-200/70">
@@ -140,9 +135,6 @@
                                     <div class="text-neutral-900">—</div>
                                 @endif
                             </td>
-                            <td class="px-5 py-4">
-                                <div class="text-neutral-900">{{ $r->email }}</div>
-                            </td>
                             <td class="px-5 py-4 whitespace-nowrap">
                                 <div class="font-semibold text-neutral-900">{{ $r->eventSession->starts_at->format('d/m/Y H:i') }}</div>
                             </td>
@@ -152,25 +144,39 @@
                             <td class="px-5 py-4 font-semibold text-neutral-900 text-center">{{ $r->child_count }}</td>
                             <td class="px-5 py-4 font-semibold text-neutral-900 text-center">{{ $r->total_count }}</td>
                             <td class="px-5 py-4 text-center">
-                                @if($r->status === 'confirmed')
+                                @if($r->status === 'pending')
+                                    <span class="text-lg" title="Chờ xác nhận">⏳</span>
+                                @elseif($r->status === 'confirmed')
                                     <span class="text-lg" title="Đã xác nhận">✅</span>
                                 @else
                                     <span class="text-lg" title="Đã hủy">❌</span>
                                 @endif
                             </td>
                             <td class="pr-6 py-4 text-center">
+                                @if($r->status === 'pending')
+                                    <form action="{{ url('/admin/registrations/'.$r->id.'/confirm') }}" method="POST" class="inline">
+                                        @csrf
+                                        <button
+                                            type="submit"
+                                            class="p-2 hover:bg-green-200 rounded-lg transition-colors cursor-pointer hover:scale-110"
+                                            title="Xác nhận"
+                                        >
+                                            <span class="material-symbols-outlined text-lg" style="color: #16a34a;">check_circle</span>
+                                        </button>
+                                    </form>
+                                @endif
                                 <a
                                     href="{{ url('/admin/registrations/'.$r->id.'/edit') }}"
-                                    class="p-2 hover:bg-primary/10 text-primary rounded-lg transition-colors"
+                                    class="inline-flex p-2 hover:bg-blue-100 rounded-lg transition-colors cursor-pointer hover:scale-110"
                                     title="Sửa"
                                 >
-                                    <span class="material-symbols-outlined text-lg">edit</span>
+                                    <span class="material-symbols-outlined text-lg" style="color: #2563eb;">edit</span>
                                 </a>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td class="px-4 py-12 text-center text-sm text-neutral-700/80" colspan="12">
+                            <td class="px-4 py-12 text-center text-sm text-neutral-700/80" colspan="11">
                                 Chưa có đăng ký.
                             </td>
                         </tr>
@@ -231,12 +237,44 @@
         function applyFilters() {
             const session = document.getElementById('sessionFilter').value;
             const status = document.getElementById('statusFilter').value;
-            const phone = document.getElementById('phoneFilter').value;
+            const search = document.getElementById('searchFilter').value;
             let url = new URL('{{ url("/admin/registrations") }}');
             if (session) url.searchParams.set('session_id', session);
             if (status) url.searchParams.set('status', status);
-            if (phone) url.searchParams.set('phone', phone);
-            window.location.href = url.toString();
+            if (search) url.searchParams.set('search', search);
+            
+            fetch(url.toString(), {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.text())
+            .then(html => {
+                const parser = new DOMParser();
+                const newDoc = parser.parseFromString(html, 'text/html');
+                const newTable = newDoc.querySelector('table');
+                const newPagination = newDoc.querySelector('.mt-4');
+                
+                if (newTable) {
+                    document.querySelector('table').replaceWith(newTable);
+                }
+                if (newPagination) {
+                    document.querySelector('.mt-4').replaceWith(newPagination);
+                }
+                
+                document.querySelectorAll('details.phone-dropdown').forEach(details => {
+                    details.addEventListener('toggle', function() {
+                        if (this.open) {
+                            document.querySelectorAll('details.phone-dropdown').forEach(other => {
+                                if (other !== this) other.open = false;
+                            });
+                            startAutoCloseTimer(this);
+                        } else {
+                            clearAutoCloseTimer();
+                        }
+                    });
+                });
+            });
         }
     </script>
 @endsection

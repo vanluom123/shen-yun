@@ -146,7 +146,8 @@
     }
 
     .rsvp-subtitle {
-        @apply my-4 text-sm text-neutral-100/85 drop-shadow-[var(--drop-shadow-subtitle)] sm:text-base;
+        @apply my-4 text-sm text-neutral-100/85 drop-shadow-[var(--drop-shadow-subtitle)]
+               sm:text-base lg:text-lg mx-auto leading-relaxed;
     }
 
     .rsvp-panel {
@@ -278,11 +279,11 @@
     }
 
     .btn {
-        @apply cursor-pointer w-full inline-flex items-center justify-center rounded-xl py-3.5 text-sm font-semibold tracking-[0.22em] shadow-[var(--shadow-button)] active:translate-y-px;
+        @apply cursor-pointer w-full inline-flex items-center justify-center rounded-xl py-3.5 text-sm font-semibold shadow-[var(--shadow-button)] active:translate-y-px;
     }
 
     .btn-gold {
-        @apply bg-[#d9b76f] tracking-[0.22em] text-black shadow-[var(--shadow-button)] hover:bg-[#e3c57e] active:translate-y-px;
+        @apply bg-[#d9b76f] text-black shadow-[var(--shadow-button)] hover:bg-[#e3c57e] active:translate-y-px;
     }
 
     .btn-dark {

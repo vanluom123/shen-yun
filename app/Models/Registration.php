@@ -26,8 +26,13 @@ class Registration extends Model
     ];
 
     protected $attributes = [
-        'status' => 'confirmed',
+        'status' => 'pending',
     ];
+
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
 
     public function isConfirmed(): bool
     {

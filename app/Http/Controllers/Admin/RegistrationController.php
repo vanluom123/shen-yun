@@ -33,7 +33,7 @@ class RegistrationController extends Controller
             ->orderByDesc('event_sessions.starts_at');
 
         $status = $request->query('status');
-        if ($status && in_array($status, ['confirmed', 'cancelled'])) {
+        if ($status && in_array($status, ['pending', 'confirmed', 'cancelled'])) {
             $query->where('registrations.status', $status);
         }
 
@@ -42,21 +42,25 @@ class RegistrationController extends Controller
             $query->where('registrations.event_session_id', $sessionId);
         }
 
-        $phone = $request->query('phone');
-        if ($phone) {
-            $query->where(function($q) use ($phone) {
-                $q->where('registrations.phone', 'like', "%{$phone}%");
+        $search = $request->query('search');
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                // Search in phone
+                $q->where('registrations.phone', 'like', "%{$search}%");
                 
                 // If starts with 0, also search for +84
-                if (str_starts_with($phone, '0')) {
-                    $alt = '+84' . substr($phone, 1);
+                if (str_starts_with($search, '0')) {
+                    $alt = '+84' . substr($search, 1);
                     $q->orWhere('registrations.phone', 'like', "%{$alt}%");
                 } 
                 // If starts with +84, also search for 0
-                elseif (str_starts_with($phone, '+84')) {
-                    $alt = '0' . substr($phone, 3);
+                elseif (str_starts_with($search, '+84')) {
+                    $alt = '0' . substr($search, 3);
                     $q->orWhere('registrations.phone', 'like', "%{$alt}%");
                 }
+                
+                // Search in full_name (inviter)
+                $q->orWhere('registrations.full_name', 'like', "%{$search}%");
             });
         }
 
@@ -71,7 +75,7 @@ class RegistrationController extends Controller
             'registrations' => $regs,
             'statusFilter' => $status,
             'sessionIdFilter' => $sessionId,
-            'phoneFilter' => $phone,
+            'searchFilter' => $search,
             'sessions' => $sessions,
         ]);
     }
@@ -85,7 +89,7 @@ class RegistrationController extends Controller
             ->orderByDesc('event_sessions.starts_at');
 
         $status = $request->query('status');
-        if ($status && in_array($status, ['confirmed', 'cancelled'])) {
+        if ($status && in_array($status, ['pending', 'confirmed', 'cancelled'])) {
             $query->where('registrations.status', $status);
         }
 
@@ -94,18 +98,20 @@ class RegistrationController extends Controller
             $query->where('registrations.event_session_id', $sessionId);
         }
 
-        $phone = $request->query('phone');
-        if ($phone) {
-            $query->where(function($q) use ($phone) {
-                $q->where('registrations.phone', 'like', "%{$phone}%");
+        $search = $request->query('search');
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('registrations.phone', 'like', "%{$search}%");
                 
-                if (str_starts_with($phone, '0')) {
-                    $alt = '+84' . substr($phone, 1);
+                if (str_starts_with($search, '0')) {
+                    $alt = '+84' . substr($search, 1);
                     $q->orWhere('registrations.phone', 'like', "%{$alt}%");
-                } elseif (str_starts_with($phone, '+84')) {
-                    $alt = '0' . substr($phone, 3);
+                } elseif (str_starts_with($search, '+84')) {
+                    $alt = '0' . substr($search, 3);
                     $q->orWhere('registrations.phone', 'like', "%{$alt}%");
                 }
+                
+                $q->orWhere('registrations.full_name', 'like', "%{$search}%");
             });
         }
 
@@ -145,7 +151,6 @@ class RegistrationController extends Controller
                     'Địa điểm',
                     'Trình chiếu',
                     'Họ tên',
-                    'Email',
                     'Phone',
                     'Khách',
                     'NTL',
@@ -166,7 +171,6 @@ class RegistrationController extends Controller
                             $r->eventSession?->venue?->name,
                             $r->eventSession?->starts_at?->format('d/m/Y H:i'),
                             $r->full_name,
-                            $r->email,
                             $r->phone,
                             $r->adult_count,
                             $r->ntl_count,
@@ -195,7 +199,7 @@ class RegistrationController extends Controller
             ->orderByDesc('event_sessions.starts_at');
 
         $status = $request->query('status');
-        if ($status && in_array($status, ['confirmed', 'cancelled'])) {
+        if ($status && in_array($status, ['pending', 'confirmed', 'cancelled'])) {
             $query->where('registrations.status', $status);
         }
 
@@ -204,18 +208,20 @@ class RegistrationController extends Controller
             $query->where('registrations.event_session_id', $sessionId);
         }
 
-        $phone = $request->query('phone');
-        if ($phone) {
-            $query->where(function($q) use ($phone) {
-                $q->where('registrations.phone', 'like', "%{$phone}%");
+        $search = $request->query('search');
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('registrations.phone', 'like', "%{$search}%");
                 
-                if (str_starts_with($phone, '0')) {
-                    $alt = '+84' . substr($phone, 1);
+                if (str_starts_with($search, '0')) {
+                    $alt = '+84' . substr($search, 1);
                     $q->orWhere('registrations.phone', 'like', "%{$alt}%");
-                } elseif (str_starts_with($phone, '+84')) {
-                    $alt = '0' . substr($phone, 3);
+                } elseif (str_starts_with($search, '+84')) {
+                    $alt = '0' . substr($search, 3);
                     $q->orWhere('registrations.phone', 'like', "%{$alt}%");
                 }
+                
+                $q->orWhere('registrations.full_name', 'like', "%{$search}%");
             });
         }
 
@@ -240,7 +246,6 @@ class RegistrationController extends Controller
             fwrite($out, "<col style=\"width:160px\">");  // Địa điểm
             fwrite($out, "<col style=\"width:140px\">");  // Trình chiếu
             fwrite($out, "<col style=\"width:180px\">");  // Họ tên
-            fwrite($out, "<col style=\"width:240px\">");  // Email
             fwrite($out, "<col style=\"width:140px\">");  // Phone
             fwrite($out, "<col style=\"width:80px\">");   // Khách
             fwrite($out, "<col style=\"width:80px\">");   // NTL
@@ -258,7 +263,6 @@ class RegistrationController extends Controller
                 'Địa điểm',
                 'Trình chiếu',
                 'Họ tên',
-                'Email',
                 'Phone',
                 'Khách',
                 'NTL',
@@ -283,7 +287,6 @@ class RegistrationController extends Controller
                         $r->eventSession?->venue?->name,
                         $r->eventSession?->starts_at?->format('d/m/Y H:i'),
                         $r->full_name,
-                        $r->email,
                         $r->phone,
                         $r->adult_count,
                         $r->ntl_count,
@@ -335,11 +338,14 @@ class RegistrationController extends Controller
             'ntl_count' => ['required', 'integer', 'min:0', 'max:999'],
             'ntl_new_count' => ['required', 'integer', 'min:0', 'max:999'],
             'child_count' => ['required', 'integer', 'min:0', 'max:999'],
+            'attend_with_guest' => ['required', 'in:0,1'],
         ]);
 
         if (!empty($data['phone'])) {
             $data['phone'] = ltrim(preg_replace('/\D+/', '', (string)$data['phone']), '0');
         }
+
+        $data['attend_with_guest'] = (bool) $data['attend_with_guest'];
 
         $oldSessionId = $registration->event_session_id;
         $oldTotalCount = $registration->total_count;
@@ -363,6 +369,20 @@ class RegistrationController extends Controller
         }
 
         return redirect()->to('/admin/registrations')->with('success', 'Cập nhật thành công.');
+    }
+
+    public function confirm(Registration $registration)
+    {
+        $wasPending = $registration->status === 'pending';
+        $sessionId = $registration->event_session_id;
+
+        $registration->update(['status' => 'confirmed']);
+
+        if ($wasPending) {
+            EventSession::recalculateReserved($sessionId);
+        }
+
+        return redirect()->to('/admin/registrations')->with('success', 'Đã xác nhận đăng ký.');
     }
 
     public function cancel(Registration $registration)

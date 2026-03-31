@@ -326,6 +326,7 @@ class RegistrationWizardController extends Controller
                 'child_count' => (int) $draft['child_count'],
                 'total_count' => (int) $draft['total_count'],
                 'attend_with_guest' => (bool) ($draft['attend_with_guest'] ?? false),
+                'status' => 'pending',
             ]);
         });
 

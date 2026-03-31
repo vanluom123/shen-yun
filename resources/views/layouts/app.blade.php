@@ -7,12 +7,32 @@
 
         <title>{{ $title ?? config('app.name', 'Phong trà') }}</title>
 
+        <link rel="icon" id="favicon" type="image/webp" href="{{ asset('shen-yun.webp') }}">
+
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script>
+            (function() {
+                const img = new Image();
+                img.src = '{{ asset('shen-yun.webp') }}';
+                img.onload = function() {
+                    const size = 64;
+                    const canvas = document.createElement('canvas');
+                    canvas.width = canvas.height = size;
+                    const ctx = canvas.getContext('2d');
+                    ctx.beginPath();
+                    ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+                    ctx.closePath();
+                    ctx.clip();
+                    ctx.drawImage(img, 0, 0, size, size);
+                    document.getElementById('favicon').href = canvas.toDataURL('image/png');
+                };
+            })();
+        </script>
     </head>
     @php
         $isRegisterFlow = request()->is('register*') || request()->is('login');
@@ -24,8 +44,11 @@
         <body class="rsvp-shell {{ request()->is('login') ? 'rsvp-access' : '' }}">
             <div class="rsvp-shell">
                 <div class="rsvp-top">
-                    <div class="rsvp-title">{{ $appTitle }}</div>
-                    <div class="rsvp-subtitle">Trải nghiệm hành trình âm nhạc &amp; vũ đạo thư giãn cuối tuần</div>
+                    <h2 class="rsvp-title">{{ $appTitle }}</h2>
+                    <p class="rsvp-subtitle">
+                        Thưởng thức nghệ thuật<br class="sm:hidden">
+                        âm nhạc và vũ đạo thuần chính
+                    </p>
                 </div>
 
                 <main class="pb-12">
@@ -66,7 +89,7 @@
                     <div class="mt-auto pt-4 border-t border-outline-variant/30">
                          <form method="post" action="{{ url('/admin/logout') }}">
                             @csrf
-                            <button class="flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface rounded-xl transition-all group overflow-hidden whitespace-nowrap">
+                            <button class="cursor-pointer flex w-full items-center gap-3 px-3 py-2.5 text-sm font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface rounded-xl transition-all group overflow-hidden whitespace-nowrap">
                                 <span class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">logout</span>
                                 <span class="sidebar-text">Đăng xuất</span>
                             </button>
@@ -253,10 +276,6 @@
                                     href="{{ url('/login') }}"
                                     class="rounded-md px-3 py-1.5 hover:bg-black/5"
                                 >Đăng ký</a>
-                                <a
-                                    href="{{ url('/admin/login') }}"
-                                    class="rounded-md px-3 py-1.5 hover:bg-black/5"
-                                >Admin</a>
                             @endif
                         </nav>
                     </div>

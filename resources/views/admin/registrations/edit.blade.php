@@ -126,8 +126,36 @@
                 </div>
             </div>
 
+            <div class="pt-2">
+                <label class="text-sm font-medium">Đi cùng khách</label>
+                <div class="mt-3 flex items-center gap-6">
+                    <div class="flex items-center gap-2">
+                        <input
+                            id="attend_with_guest_yes"
+                            name="attend_with_guest"
+                            type="radio"
+                            value="1"
+                            {{ old('attend_with_guest', $registration->attend_with_guest) == 1 ? 'checked' : '' }}
+                            class="h-4 w-4 border-neutral-300 text-neutral-900 focus:ring-neutral-900"
+                        />
+                        <label for="attend_with_guest_yes" class="text-sm">Có</label>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input
+                            id="attend_with_guest_no"
+                            name="attend_with_guest"
+                            type="radio"
+                            value="0"
+                            {{ old('attend_with_guest', $registration->attend_with_guest) == 0 ? 'checked' : '' }}
+                            class="h-4 w-4 border-neutral-300 text-neutral-900 focus:ring-neutral-900"
+                        />
+                        <label for="attend_with_guest_no" class="text-sm">Không</label>
+                    </div>
+                </div>
+            </div>
+
             <div class="flex items-center gap-4 pt-2">
-                <button class="rounded-xl bg-neutral-900 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800">
+                <button class="rounded-xl bg-neutral-900 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800 cursor-pointer">
                     Lưu thay đổi
                 </button>
                 <a href="{{ url('/admin/registrations') }}" class="rounded-xl border border-neutral-300 px-5 py-3 text-sm font-semibold text-neutral-700 hover:bg-neutral-50">
@@ -144,7 +172,7 @@
                     @csrf
                     <button
                         type="submit"
-                        class="rounded-xl border border-red-300 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 hover:bg-red-100"
+                        class="rounded-xl border border-red-300 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 hover:bg-red-100 cursor-pointer"
                         onclick="return confirm('Bạn có chắc muốn hủy đăng ký này?')"
                     >
                         Hủy đăng ký
@@ -155,16 +183,16 @@
 
         <div class="mt-8 border-t border-neutral-200 pt-6">
             <h3 class="text-lg font-semibold text-red-700">Xóa đăng ký</h3>
-            <p class="mt-1 text-sm text-neutral-600">Xóa vĩnh viễn đăng ký này. Hành động này không thể hoàn tác.</p>
+            <p class="mt-1 text-sm text-neutral-600">Hành động này không thể hoàn tác.</p>
             <form method="post" action="{{ url('/admin/registrations/'.$registration->id) }}" class="mt-4">
                 @csrf
                 @method('delete')
                 <button
                     type="submit"
-                    class="rounded-xl border border-red-600 bg-red-700 px-5 py-3 text-sm font-semibold text-white hover:bg-red-800"
-                    onclick="return confirm('Bạn có chắc muốn xóa vĩnh viễn đăng ký này? Hành động này không thể hoàn tác.')"
+                    class="rounded-xl border border-red-600 bg-red-700 px-5 py-3 text-sm font-semibold text-white hover:bg-red-800 cursor-pointer"
+                    onclick="return confirm('Bạn có chắc muốn xóa đăng ký này? Hành động này không thể hoàn tác.')"
                 >
-                    Xóa vĩnh viễn
+                    Xóa
                 </button>
             </form>
         </div>

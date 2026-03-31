@@ -23,7 +23,7 @@
                 </div>
 
                 <button type="submit" class="btn btn-gold">
-                    Vào admin
+                    đăng nhập
                 </button>
             </form>
         </div>
