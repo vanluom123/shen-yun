@@ -44,8 +44,11 @@
         <body class="rsvp-shell {{ request()->is('login') ? 'rsvp-access' : '' }}">
             <div class="rsvp-shell">
                 <div class="rsvp-top">
-                    <div class="rsvp-title">{{ $appTitle }}</div>
-                    <div class="rsvp-subtitle">Trải nghiệm hành trình âm nhạc &amp; vũ đạo thuần chính</div>
+                    <h2 class="rsvp-title">{{ $appTitle }}</h2>
+                    <p class="rsvp-subtitle">
+                        Thưởng thức nghệ thuật<br class="sm:hidden">
+                        âm nhạc và vũ đạo thuần chính
+                    </p>
                 </div>
 
                 <main class="pb-12">

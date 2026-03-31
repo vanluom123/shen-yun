@@ -147,7 +147,7 @@
 
     .rsvp-subtitle {
         @apply my-4 text-sm text-neutral-100/85 drop-shadow-[var(--drop-shadow-subtitle)]
-               sm:text-base max-w-xs mx-auto sm:max-w-none text-balance;
+               sm:text-base lg:text-lg mx-auto leading-relaxed;
     }
 
     .rsvp-panel {
