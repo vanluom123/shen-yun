@@ -46,6 +46,6 @@ class AdminAuthController extends Controller
     {
         Session::forget('admin_authed');
 
-        return redirect()->to('/')->with('status', 'Đã đăng xuất admin session.');
+        return redirect()->to('/admin/login')->with('status', 'Đã đăng xuất admin session.');
     }
 }

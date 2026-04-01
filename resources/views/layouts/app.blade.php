@@ -243,9 +243,9 @@
         <body class="min-h-dvh bg-transparent text-neutral-900">
             <div class="min-h-dvh flex flex-col admin-container">
                 <header class="admin-header">
-                    <div class="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3 sm:py-4">
-                        <a href="{{ url('/') }}" class="font-semibold tracking-tight text-lg">
-                            {{ $appTitle }}
+                    <div class="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-2 sm:py-3">
+                        <a href="{{ url('/') }}" class="flex items-center">
+                            <img src="{{ asset('shen-yun.webp') }}" alt="{{ $appTitle }}" class="h-14 w-14 rounded-full object-cover border border-outline-variant/30">
                         </a>
 
                         <nav class="flex items-center gap-1 sm:gap-2 text-sm">
@@ -266,11 +266,6 @@
                 </header>
 
                 <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-10">
-                    @if (session('status'))
-                        <div class="mb-6 rounded-xl border border-emerald-200/60 bg-emerald-50/90 px-4 py-3 text-emerald-900 backdrop-blur">
-                            {{ session('status') }}
-                        </div>
-                    @endif
 
                     {{ $slot ?? '' }}
                     @yield('content')
