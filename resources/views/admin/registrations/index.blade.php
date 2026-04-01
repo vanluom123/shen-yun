@@ -54,9 +54,9 @@
                         class="w-full appearance-none rounded-xl border border-neutral-200 bg-white py-2 pl-9 pr-8 text-sm text-neutral-700 outline-none hover:bg-neutral-50 focus:border-neutral-300"
                         onchange="applyFilters()"
                     >
-                        <option value="">Trình chiếu: Tất cả</option>
+                        <option value="all" {{ $sessionIdFilter === 'all' ? 'selected' : '' }}>Trình chiếu: Tất cả</option>
                         @foreach($sessions as $session)
-                            <option value="{{ $session->id }}" {{ $sessionIdFilter == $session->id ? 'selected' : '' }}>
+                            <option value="{{ $session->id }}" {{ (string)$sessionIdFilter === (string)$session->id ? 'selected' : '' }}>
                                 Trình chiếu: {{ $session->starts_at->format('d/m/Y H:i') }}
                             </option>
                         @endforeach
@@ -112,11 +112,14 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-neutral-200/70">
-                    @forelse ($registrations as $r)
+                    @php
+        $backUrl = url('/admin/registrations') . (request()->getQueryString() ? '?' . request()->getQueryString() : '');
+    @endphp
+    @forelse ($registrations as $r)
                         <tr class="hover:bg-neutral-100 register-list__tr group">
                             <td class="pl-6 py-4 font-mono text-xs text-neutral-700">#{{ $r->id }}</td>
                             <td class="px-5 py-4 sticky left-0 z-10 bg-white sticky-col">
-                                <a href="{{ url('/admin/registrations/'.$r->id.'/edit') }}" class="block min-h-[44px] min-w-[44px] flex items-center font-semibold text-neutral-900 hover:underline">
+                                <a href="{{ url('/admin/registrations/'.$r->id.'/edit') }}?back={{ urlencode($backUrl) }}" class="block min-h-[44px] min-w-[44px] flex items-center font-semibold text-neutral-900 hover:underline">
                                     {{ $r->full_name }}
                                 </a>
                             </td>
@@ -156,6 +159,7 @@
                                 @if($r->status === 'pending')
                                     <form action="{{ url('/admin/registrations/'.$r->id.'/confirm') }}" method="POST" class="inline">
                                         @csrf
+                                        <input type="hidden" name="redirect_to" value="{{ url()->current() }}{{ request()->getQueryString() ? '?'.request()->getQueryString() : '' }}">
                                         <button
                                             type="submit"
                                             class="p-2 hover:bg-green-200 rounded-lg transition-colors cursor-pointer hover:scale-110"
@@ -166,7 +170,7 @@
                                     </form>
                                 @endif
                                 <a
-                                    href="{{ url('/admin/registrations/'.$r->id.'/edit') }}"
+                                    href="{{ url('/admin/registrations/'.$r->id.'/edit') }}?back={{ urlencode($backUrl) }}"
                                     class="inline-flex p-2 hover:bg-blue-100 rounded-lg transition-colors cursor-pointer hover:scale-110"
                                     title="Sửa"
                                 >
@@ -205,18 +209,7 @@
             clearTimeout(autoCloseTimer);
         }
 
-        document.querySelectorAll('details.phone-dropdown').forEach(details => {
-            details.addEventListener('toggle', function() {
-                if (this.open) {
-                    document.querySelectorAll('details.phone-dropdown').forEach(other => {
-                        if (other !== this) other.open = false;
-                    });
-                    startAutoCloseTimer(this);
-                } else {
-                    clearAutoCloseTimer();
-                }
-            });
-        });
+        bindPhoneDropdowns();
 
         document.addEventListener('click', function(event) {
             const isClickInside = event.target.closest('details.phone-dropdown');
@@ -242,37 +235,32 @@
             if (session) url.searchParams.set('session_id', session);
             if (status) url.searchParams.set('status', status);
             if (search) url.searchParams.set('search', search);
-            
-            fetch(url.toString(), {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.text())
-            .then(html => {
-                const parser = new DOMParser();
-                const newDoc = parser.parseFromString(html, 'text/html');
-                const newTable = newDoc.querySelector('table');
-                const newPagination = newDoc.querySelector('.mt-4');
-                
-                if (newTable) {
-                    document.querySelector('table').replaceWith(newTable);
-                }
-                if (newPagination) {
-                    document.querySelector('.mt-4').replaceWith(newPagination);
-                }
-                
-                document.querySelectorAll('details.phone-dropdown').forEach(details => {
-                    details.addEventListener('toggle', function() {
-                        if (this.open) {
-                            document.querySelectorAll('details.phone-dropdown').forEach(other => {
-                                if (other !== this) other.open = false;
-                            });
-                            startAutoCloseTimer(this);
-                        } else {
-                            clearAutoCloseTimer();
-                        }
-                    });
+
+            history.pushState(null, '', url.toString());
+
+            fetch(url.toString(), { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+                .then(r => r.text())
+                .then(html => {
+                    const doc = new DOMParser().parseFromString(html, 'text/html');
+                    const newTable = doc.querySelector('table');
+                    const newPagination = doc.querySelector('.mt-4');
+                    if (newTable) document.querySelector('table').replaceWith(newTable);
+                    if (newPagination) document.querySelector('.mt-4').replaceWith(newPagination);
+                    bindPhoneDropdowns();
+                });
+        }
+
+        function bindPhoneDropdowns() {
+            document.querySelectorAll('details.phone-dropdown').forEach(details => {
+                details.addEventListener('toggle', function() {
+                    if (this.open) {
+                        document.querySelectorAll('details.phone-dropdown').forEach(other => {
+                            if (other !== this) other.open = false;
+                        });
+                        startAutoCloseTimer(this);
+                    } else {
+                        clearAutoCloseTimer();
+                    }
                 });
             });
         }

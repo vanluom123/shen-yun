@@ -1,10 +1,22 @@
 @extends('layouts.app', ['title' => 'Admin – Chỉnh sửa đăng ký'])
 
 @section('content')
+    @php $backUrl = request()->query('back') ? urldecode(request()->query('back')) : url('/admin/registrations'); @endphp
     <div class="rounded-3xl border border-white/25 bg-white/65 p-5 shadow-[0_16px_60px_rgba(0,0,0,0.18)] backdrop-blur-md sm:p-6">
         <div class="mb-6">
-            <a href="{{ url('/admin/registrations') }}" class="text-sm text-neutral-700 hover:underline">← Quay lại danh sách</a>
+            <a href="{{ $backUrl }}" class="text-sm text-neutral-700 hover:underline">← Quay lại danh sách</a>
             <h1 class="mt-2 text-2xl font-semibold tracking-tight">Chỉnh sửa đăng ký #{{ $registration->id }}</h1>
+            <p class="mt-1 text-sm text-neutral-500">Ngày đăng ký: {{ $registration->created_at->format('d/m/Y H:i') }}</p>
+            <p class="mt-1 text-sm">
+                Trạng thái:
+                @if($registration->status === 'pending')
+                    <span class="font-semibold text-amber-600">⏳ Chờ xác nhận</span>
+                @elseif($registration->status === 'confirmed')
+                    <span class="font-semibold text-green-800">✅ Đã xác nhận</span>
+                @else
+                    <span class="font-semibold text-red-600">❌ Đã hủy</span>
+                @endif
+            </p>
         </div>
 
         @if($registration->status === 'cancelled')
@@ -13,7 +25,7 @@
             </div>
         @endif
 
-        <form method="post" action="{{ url('/admin/registrations/'.$registration->id) }}" class="max-w-2xl space-y-6">
+        <form method="post" action="{{ url('/admin/registrations/'.$registration->id) }}?back={{ urlencode($backUrl) }}" class="max-w-2xl space-y-6">
             @csrf
             @method('put')
 
@@ -158,7 +170,7 @@
                 <button class="rounded-xl bg-neutral-900 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800 cursor-pointer">
                     Lưu thay đổi
                 </button>
-                <a href="{{ url('/admin/registrations') }}" class="rounded-xl border border-neutral-300 px-5 py-3 text-sm font-semibold text-neutral-700 hover:bg-neutral-50">
+                <a href="{{ $backUrl }}" class="rounded-xl border border-neutral-300 px-5 py-3 text-sm font-semibold text-neutral-700 hover:bg-neutral-50">
                     Hủy
                 </a>
             </div>
@@ -170,6 +182,7 @@
                 <p class="mt-1 text-sm text-neutral-600">Hủy đăng ký sẽ giải phóng chỗ cho trình chiếu này.</p>
                 <form method="post" action="{{ url('/admin/registrations/'.$registration->id.'/cancel') }}" class="mt-4">
                     @csrf
+                    <input type="hidden" name="redirect_to" value="{{ $backUrl }}">
                     <button
                         type="submit"
                         class="rounded-xl border border-red-300 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 hover:bg-red-100 cursor-pointer"
@@ -187,6 +200,7 @@
             <form method="post" action="{{ url('/admin/registrations/'.$registration->id) }}" class="mt-4">
                 @csrf
                 @method('delete')
+                <input type="hidden" name="redirect_to" value="{{ $backUrl }}">
                 <button
                     type="submit"
                     class="rounded-xl border border-red-600 bg-red-700 px-5 py-3 text-sm font-semibold text-white hover:bg-red-800 cursor-pointer"

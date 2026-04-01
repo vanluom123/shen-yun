@@ -26,57 +26,62 @@ class RegistrationController extends Controller
 
     public function index(Request $request)
     {
-        $query = Registration::query()
-            ->join('event_sessions', 'registrations.event_session_id', '=', 'event_sessions.id')
-            ->select('registrations.*')
-            ->with('eventSession.venue')
-            ->orderByDesc('event_sessions.starts_at');
-
-        $status = $request->query('status');
-        if ($status && in_array($status, ['pending', 'confirmed', 'cancelled'])) {
-            $query->where('registrations.status', $status);
-        }
-
-        $sessionId = $request->query('session_id');
-        if ($sessionId) {
-            $query->where('registrations.event_session_id', $sessionId);
-        }
-
-        $search = $request->query('search');
-        if ($search) {
-            $query->where(function($q) use ($search) {
-                // Search in phone
-                $q->where('registrations.phone', 'like', "%{$search}%");
-                
-                // If starts with 0, also search for +84
-                if (str_starts_with($search, '0')) {
-                    $alt = '+84' . substr($search, 1);
-                    $q->orWhere('registrations.phone', 'like', "%{$alt}%");
-                } 
-                // If starts with +84, also search for 0
-                elseif (str_starts_with($search, '+84')) {
-                    $alt = '0' . substr($search, 3);
-                    $q->orWhere('registrations.phone', 'like', "%{$alt}%");
-                }
-                
-                // Search in full_name (inviter)
-                $q->orWhere('registrations.full_name', 'like', "%{$search}%");
-            });
-        }
-
-        $regs = $query->paginate(30)->withQueryString();
+        $status    = $request->query('status') ?: null;
+        $search    = $request->query('search') ?: null;
 
         $sessions = EventSession::query()
             ->with('venue')
             ->orderBy('starts_at', 'desc')
             ->get();
 
+        $sessionIdParam = $request->query('session_id'); // null = no param, 'all' = tất cả, else = id
+
+        if ($sessionIdParam === null) {
+            // Default: first session in current week
+            $weekStart = now()->startOfWeek();
+            $weekEnd   = now()->endOfWeek();
+            $default   = $sessions->first(fn($s) => $s->starts_at->between($weekStart, $weekEnd));
+            $sessionId = $default ? (string) $default->id : null;
+        } elseif ($sessionIdParam === 'all') {
+            $sessionId = null; // no filter
+        } else {
+            $sessionId = $sessionIdParam;
+        }
+
+        $query = Registration::query()
+            ->join('event_sessions', 'registrations.event_session_id', '=', 'event_sessions.id')
+            ->select('registrations.*')
+            ->with('eventSession.venue')
+            ->orderByDesc('event_sessions.starts_at');
+
+        if ($status && in_array($status, ['pending', 'confirmed', 'cancelled'])) {
+            $query->where('registrations.status', $status);
+        }
+
+        if ($sessionId) {
+            $query->where('registrations.event_session_id', $sessionId);
+        }
+
+        if ($search) {
+            $query->where(function($q) use ($search) {
+                $q->where('registrations.phone', 'like', "%{$search}%");
+                if (str_starts_with($search, '0')) {
+                    $q->orWhere('registrations.phone', 'like', '%+84' . substr($search, 1) . '%');
+                } elseif (str_starts_with($search, '+84')) {
+                    $q->orWhere('registrations.phone', 'like', '%0' . substr($search, 3) . '%');
+                }
+                $q->orWhere('registrations.full_name', 'like', "%{$search}%");
+            });
+        }
+
+        $regs = $query->paginate(30)->withQueryString();
+
         return view('admin.registrations.index', [
-            'registrations' => $regs,
-            'statusFilter' => $status,
-            'sessionIdFilter' => $sessionId,
-            'searchFilter' => $search,
-            'sessions' => $sessions,
+            'registrations'   => $regs,
+            'statusFilter'    => $status,
+            'sessionIdFilter' => $sessionIdParam ?? $sessionId, // 'all', specific id, or default id
+            'searchFilter'    => $search,
+            'sessions'        => $sessions,
         ]);
     }
 
@@ -368,7 +373,8 @@ class RegistrationController extends Controller
             }
         }
 
-        return redirect()->to('/admin/registrations')->with('success', 'Cập nhật thành công.');
+        $redirectTo = $request->query('back', '/admin/registrations');
+        return redirect()->to($redirectTo)->with('success', 'Cập nhật thành công.');
     }
 
     public function confirm(Registration $registration)
@@ -382,7 +388,8 @@ class RegistrationController extends Controller
             EventSession::recalculateReserved($sessionId);
         }
 
-        return redirect()->to('/admin/registrations')->with('success', 'Đã xác nhận đăng ký.');
+        $redirectTo = request()->input('redirect_to', '/admin/registrations');
+        return redirect()->to($redirectTo)->with('success', 'Đã xác nhận đăng ký.');
     }
 
     public function cancel(Registration $registration)
@@ -396,7 +403,8 @@ class RegistrationController extends Controller
             EventSession::recalculateReserved($sessionId);
         }
 
-        return redirect()->to('/admin/registrations')->with('success', 'Đã hủy đăng ký.');
+        $redirectTo = request()->input('redirect_to', '/admin/registrations');
+        return redirect()->to($redirectTo)->with('success', 'Đã hủy đăng ký.');
     }
 
     public function destroy(Registration $registration)
@@ -410,6 +418,7 @@ class RegistrationController extends Controller
             EventSession::recalculateReserved($sessionId);
         }
 
-        return redirect()->to('/admin/registrations')->with('success', 'Đã xóa đăng ký.');
+        $redirectTo = request()->input('redirect_to', '/admin/registrations');
+        return redirect()->to($redirectTo)->with('success', 'Đã xóa đăng ký.');
     }
 }
