@@ -51,6 +51,9 @@ class RegistrationWizardController extends Controller
                 ->value('id');
             if ($defaultId) {
                 $selectedVenueId = (int) $defaultId;
+            } else {
+                // Fallback: select first venue
+                $selectedVenueId = $venues->first()?->id;
             }
         }
 
