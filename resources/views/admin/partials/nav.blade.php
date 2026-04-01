@@ -23,6 +23,11 @@
     @endforeach
 
     <div class="mt-8 border-t border-outline-variant/30">
+        <a href="{{ url('/') }}" target="_blank"
+            class="flex items-center gap-3 px-3 py-2 text-sm font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface rounded-xl transition-all group overflow-hidden whitespace-nowrap">
+            <span class="material-symbols-outlined text-xl text-on-surface-variant/70 group-hover:text-on-surface transition-transform">open_in_new</span>
+            <span class="sidebar-text">Trang đăng ký</span>
+        </a>
         <form method="post" action="{{ url('/admin/logout') }}">
             @csrf
             <button class="cursor-pointer flex w-full items-center gap-3 px-3 py-2 text-sm font-medium text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface rounded-xl transition-all group overflow-hidden whitespace-nowrap">

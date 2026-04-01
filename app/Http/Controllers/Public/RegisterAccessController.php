@@ -39,7 +39,6 @@ class RegisterAccessController extends Controller
             ]);
         }
 
-        Session::forget('admin_authed');
         Session::put('guest_authed', true);
 
         return redirect()->to('/register');
