@@ -36,7 +36,19 @@
             $inputClass = 'mt-2 w-full rounded-xl border bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900';
             $normalBorder = 'border-neutral-300';
             $errorBorder = 'admin-field-invalid';
+
+            $currentSession = $sessions->firstWhere('id', $registration->event_session_id);
+            $isPastSession = $currentSession && $currentSession->starts_at->isPast();
+            $disabledAttr = $isPastSession ? 'disabled' : '';
+            $disabledClass = $isPastSession ? 'bg-neutral-100 opacity-70' : '';
         @endphp
+
+        @if($isPastSession)
+            <div class="mb-6 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800">
+                <div class="font-semibold">⚠️ Trình chiếu này đã kết thúc</div>
+                Bạn chỉ có thể chỉnh sửa thông tin liên hệ (Họ tên, Email, SĐT). Các thông tin về trình chiếu và số lượng khách đã được khóa.
+            </div>
+        @endif
 
         <form method="post" action="{{ url('/admin/registrations/'.$registration->id) }}?back={{ urlencode($backUrl) }}" class="max-w-2xl space-y-6" novalidate>
             @csrf
@@ -89,7 +101,8 @@
                 <div>
                     <label class="text-sm font-medium" for="event_session_id">Trình chiếu <span class="text-red-500">*</span></label>
                     <select id="event_session_id" name="event_session_id" required
-                        class="{{ $inputClass }} {{ $errors->has('event_session_id') ? $errorBorder : $normalBorder }}">
+                        {{ $disabledAttr }}
+                        class="{{ $inputClass }} {{ $disabledClass }} {{ $errors->has('event_session_id') ? $errorBorder : $normalBorder }}">
                         @foreach ($sessions as $s)
                             <option value="{{ $s->id }}" {{ old('event_session_id', $registration->event_session_id) == $s->id ? 'selected' : '' }}>
                                 {{ $s->venue->name }} - {{ $s->starts_at->format('d/m/Y H:i') }}
@@ -109,8 +122,9 @@
                 <div>
                     <label class="text-sm font-medium" for="{{ $field }}">{{ $label }}</label>
                     <input id="{{ $field }}" name="{{ $field }}" type="number" min="0"
+                        {{ $disabledAttr }}
                         value="{{ old($field, $registration->$field) }}" required
-                        class="{{ $inputClass }} {{ $errors->has($field) ? $errorBorder : $normalBorder }}" />
+                        class="{{ $inputClass }} {{ $disabledClass }} {{ $errors->has($field) ? $errorBorder : $normalBorder }}" />
                 </div>
                 @endforeach
             </div>
@@ -120,12 +134,14 @@
                 <div class="mt-3 flex items-center gap-6">
                     <div class="flex items-center gap-2">
                         <input id="attend_with_guest_yes" name="attend_with_guest" type="radio" value="1"
+                            {{ $disabledAttr }}
                             {{ old('attend_with_guest', $registration->attend_with_guest) == 1 ? 'checked' : '' }}
                             class="h-4 w-4 border-neutral-300 text-neutral-900 focus:ring-neutral-900" />
                         <label for="attend_with_guest_yes" class="text-sm">Có</label>
                     </div>
                     <div class="flex items-center gap-2">
                         <input id="attend_with_guest_no" name="attend_with_guest" type="radio" value="0"
+                            {{ $disabledAttr }}
                             {{ old('attend_with_guest', $registration->attend_with_guest) == 0 ? 'checked' : '' }}
                             class="h-4 w-4 border-neutral-300 text-neutral-900 focus:ring-neutral-900" />
                         <label for="attend_with_guest_no" class="text-sm">Không</label>
@@ -134,11 +150,12 @@
             </div>
 
             <div class="flex items-center gap-4 pt-2">
-                <button class="rounded-xl bg-neutral-900 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800 cursor-pointer">
+                <button type="submit"
+                    class="rounded-xl bg-neutral-900 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800 cursor-pointer">
                     Lưu thay đổi
                 </button>
                 <a href="{{ $backUrl }}" class="rounded-xl border border-neutral-300 px-5 py-3 text-sm font-semibold text-neutral-700 hover:bg-neutral-50">
-                    Hủy
+                    {{ $isPastSession ? 'Quay lại' : 'Hủy' }}
                 </a>
             </div>
         </form>
@@ -151,8 +168,9 @@
                     @csrf
                     <input type="hidden" name="redirect_to" value="{{ $backUrl }}">
                     <button type="submit"
-                        class="rounded-xl border border-red-300 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 hover:bg-red-100 cursor-pointer"
-                        onclick="return confirm('Bạn có chắc muốn hủy đăng ký này?')">
+                        {{ $disabledAttr }}
+                        class="rounded-xl border border-red-300 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 shadow-sm hover:bg-red-100 {{ $isPastSession ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer' }}"
+                        @if(! $isPastSession) onclick="return confirm('Bạn có chắc muốn hủy đăng ký này?')" @endif>
                         Hủy đăng ký
                     </button>
                 </form>
@@ -167,8 +185,9 @@
                 @method('delete')
                 <input type="hidden" name="redirect_to" value="{{ $backUrl }}">
                 <button type="submit"
-                    class="rounded-xl border admin-field-invalid bg-red-700 px-5 py-3 text-sm font-semibold text-white hover:bg-red-800 cursor-pointer"
-                    onclick="return confirm('Bạn có chắc muốn xóa đăng ký này? Hành động này không thể hoàn tác.')">
+                    {{ $disabledAttr }}
+                    class="rounded-xl border admin-field-invalid bg-red-700 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-red-800 {{ $isPastSession ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer' }}"
+                    @if(! $isPastSession) onclick="return confirm('Bạn có chắc muốn xóa đăng ký này? Hành động này không thể hoàn tác.')" @endif>
                     Xóa
                 </button>
             </form>

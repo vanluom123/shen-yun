@@ -16,8 +16,14 @@ class EnsureAdminAuthed
      */
     public function handle(Request $request, Closure $next): Response
     {
+        $adminToken = hash_hmac('sha256', (string) config('rsvp.admin_password'), (string) config('app.key'));
+
         if (! Session::get('admin_authed', false)) {
-            return redirect()->to('/admin/login');
+            if ($request->cookie('admin_remember') === $adminToken) {
+                Session::put('admin_authed', true);
+            } else {
+                return redirect()->to('/admin/login');
+            }
         }
 
         return $next($request);

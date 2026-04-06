@@ -11,6 +11,7 @@
     --font-headline: "Noto Serif", serif;
     --font-body: "Manrope", sans-serif;
     --font-label: "Manrope", sans-serif;
+    --font-slogan: "Be Vietnam Pro", "Noto Serif", sans-serif;
 
     --color-champagne-gold: #D4B37D;
     --color-deep-forest: #2D3A2F;
@@ -150,8 +151,7 @@
     }
 
     .rsvp-subtitle {
-        @apply my-4 text-sm text-neutral-100/85 drop-shadow-[var(--drop-shadow-subtitle)]
-               sm:text-base lg:text-lg mx-auto leading-relaxed;
+        @apply font-slogan my-4 text-sm text-neutral-100/85 drop-shadow-[var(--drop-shadow-subtitle)] sm:text-base lg:text-lg mx-auto leading-relaxed;
     }
 
     .rsvp-panel {
@@ -356,8 +356,8 @@
 
 /* Admin Redesign Components */
 .register-list {
-   .register-list__tr{
-         &:hover {
+    .register-list__tr {
+        &:hover {
             td {
                 @apply bg-black/3;
             }

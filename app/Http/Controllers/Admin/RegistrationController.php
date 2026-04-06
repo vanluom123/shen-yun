@@ -321,7 +321,10 @@ class RegistrationController extends Controller
         $venues = Venue::query()->orderBy('name')->get();
         $sessions = EventSession::query()
             ->with('venue')
-            ->where('starts_at', '>=', now())
+            ->where(function($q) use ($registration) {
+                $q->where('starts_at', '>=', now())
+                  ->orWhere('id', $registration->event_session_id);
+            })
             ->orderBy('starts_at')
             ->get();
 

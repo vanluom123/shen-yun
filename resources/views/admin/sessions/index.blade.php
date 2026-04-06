@@ -136,6 +136,8 @@
                                     @forelse ($sessions as $s)
                                         @php
                                             $remaining = max(0, $s->capacity_total - $s->capacity_reserved);
+                                            $isExpired = $s->starts_at->isPast();
+
                                             $statusStyles = [
                                                 'open' => 'bg-emerald-100 text-emerald-700',
                                                 'paused' => 'bg-amber-100 text-amber-700',
@@ -151,9 +153,16 @@
                                                 'paused' => 'Tạm hoãn',
                                                 'hidden' => 'Ẩn',
                                             ];
-                                            $style = $statusStyles[$s->registration_status] ?? 'bg-neutral-100 text-neutral-800';
-                                            $dot = $statusDots[$s->registration_status] ?? 'bg-neutral-400';
-                                            $label = $statusLabels[$s->registration_status] ?? $s->registration_status;
+
+                                            if ($isExpired) {
+                                                $style = 'bg-orange-100 text-orange-700';
+                                                $dot = 'bg-orange-500';
+                                                $label = 'Hết hạn';
+                                            } else {
+                                                $style = $statusStyles[$s->registration_status] ?? 'bg-neutral-100 text-neutral-800';
+                                                $dot = $statusDots[$s->registration_status] ?? 'bg-neutral-400';
+                                                $label = $statusLabels[$s->registration_status] ?? $s->registration_status;
+                                            }
                                         @endphp
                                         <tr class="group {{ $s->isHidden() ? 'opacity-60 saturate-0' : '' }}">
                                             <td class="text-center">
