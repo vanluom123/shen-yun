@@ -16,8 +16,14 @@ class EnsureGuestAuthed
      */
     public function handle(Request $request, Closure $next): Response
     {
+        $guestToken = hash_hmac('sha256', (string) config('rsvp.guest_password'), (string) config('app.key'));
+        
         if (! Session::get('guest_authed', false)) {
-            return redirect()->to('/login');
+            if ($request->cookie('guest_remember') === $guestToken) {
+                Session::put('guest_authed', true);
+            } else {
+                return redirect()->to('/login');
+            }
         }
 
         return $next($request);

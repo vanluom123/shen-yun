@@ -1,5 +1,6 @@
 @php
     $session = $session ?? null;
+    $isExpired = $session && $session->starts_at->isPast();
 @endphp
 
 <div class="space-y-4">
@@ -9,7 +10,8 @@
             id="venue_id"
             name="venue_id"
             required
-            class="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            @if($isExpired) disabled @endif
+            class="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900 @if($isExpired) bg-neutral-100 opacity-70 @endif"
         >
             <option value="" disabled {{ empty(old('venue_id', $session?->venue_id ?? $default_venue_id ?? null)) ? 'selected' : '' }}>Chọn địa điểm…</option>
             @foreach ($venues as $v)
@@ -28,7 +30,8 @@
             type="datetime-local"
             value="{{ old('starts_at', $session?->starts_at?->format('Y-m-d\TH:i') ?? $default_starts_at ?? '') }}"
             required
-            class="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900"
+            @if($isExpired) disabled @endif
+            class="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900 @if($isExpired) bg-neutral-100 opacity-70 @endif"
         />
     </div>
 
@@ -42,7 +45,8 @@
                 min="1"
                 value="{{ old('capacity_total', $session?->capacity_total ?? $default_capacity ?? 36) }}"
                 required
-                class="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900"
+                @if($isExpired) disabled @endif
+                class="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900 @if($isExpired) bg-neutral-100 opacity-70 @endif"
             />
         </div>
 
@@ -52,10 +56,17 @@
                 id="registration_status"
                 name="registration_status"
                 required
-                class="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900"
+                @if($isExpired) disabled @endif
+                class="mt-2 w-full rounded-xl border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900 @if($isExpired) bg-neutral-100 opacity-70 @endif"
             >
-                @foreach (['open' => 'Hoạt động', 'paused' => 'Tạm hoãn', 'hidden' => 'Ẩn'] as $val => $label)
-                    <option value="{{ $val }}" {{ old('registration_status', $session?->registration_status ?? 'open') === $val ? 'selected' : '' }}>
+                @if($isExpired)
+                    <option value="expired" selected>Hết hạn</option>
+                @endif
+                @php
+                    $statuses = ['open' => 'Hoạt động', 'paused' => 'Tạm hoãn', 'hidden' => 'Ẩn'];
+                @endphp
+                @foreach ($statuses as $val => $label)
+                    <option value="{{ $val }}" {{ (! $isExpired && old('registration_status', $session?->registration_status ?? 'open') === $val) ? 'selected' : '' }}>
                         {{ $label }}
                     </option>
                 @endforeach
