@@ -11,6 +11,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
         $middleware->alias([
             'guest.authed' => \App\Http\Middleware\EnsureGuestAuthed::class,
             'admin.authed' => \App\Http\Middleware\EnsureAdminAuthed::class,

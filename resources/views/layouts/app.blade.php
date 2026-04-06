@@ -238,6 +238,28 @@
                     }
                 });
             </script>
+
+            <!-- OneSignal SDK for Push Notifications -->
+            <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+            <script>
+                window.OneSignalDeferred = window.OneSignalDeferred || [];
+                OneSignalDeferred.push(function(OneSignal) {
+                    OneSignal.init({
+                        appId: "{{ config('services.onesignal.app_id') }}",
+                        notifyButton: {
+                            enable: false
+                        },
+                        promptOptions: {
+                            slidedown: {
+                                enabled: true,
+                                actionMessage: "Receive notifications for new registrations.",
+                                acceptButtonText: "ALLOW",
+                                cancelButtonText: "NO THANKS"
+                            }
+                        }
+                    });
+                });
+            </script>
         </body>
     @else
         <body class="min-h-dvh bg-transparent text-neutral-900">

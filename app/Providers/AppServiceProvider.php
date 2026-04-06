@@ -11,7 +11,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Override ntfy send service to disable SSL verification
+        $this->app->bind(
+            \Wijourdil\NtfyNotificationChannel\Services\AbstractSendService::class,
+            \App\Services\CustomNtfySendService::class
+        );
     }
 
     /**
@@ -19,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        if (str_contains(config('app.url'), 'https://')) {
+            \Illuminate\Support\Facades\URL::forceScheme('https');
+        }
     }
 }
