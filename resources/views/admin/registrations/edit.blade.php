@@ -242,7 +242,7 @@
                 @method('delete')
                 <input type="hidden" name="redirect_to" value="{{ $backUrl }}">
                 <button type="submit"
-                    {{ $disabledAttr }}
+                    {{ $isPastSession ? 'disabled' : '' }}
                     class="rounded-xl border admin-field-invalid bg-red-700 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-red-800 {{ $isPastSession ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer' }}"
                     @if(! $isPastSession) onclick="return confirm('Bạn có chắc muốn xóa đăng ký này? Hành động này không thể hoàn tác.')" @endif>
                     Xóa

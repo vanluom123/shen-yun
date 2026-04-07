@@ -8,7 +8,7 @@ use Wijourdil\NtfyNotificationChannel\Channels\NtfyChannel;
 
 class NewEventRegistration extends Notification
 {
-    public function __construct(private $registration)
+    public function __construct(private $registration, private string $type = 'new')
     {
     }
 
@@ -60,26 +60,45 @@ class NewEventRegistration extends Notification
         $message = new Message();
 
         $message->topic(config('ntfy-notification-channel.topic'));
-        $message->title("Tiệc trà {$venueName} - Đăng ký mới!");
+
+        $titleMap = [
+            'new' => 'Đăng ký mới!',
+            'updated' => 'Cập nhật đăng ký!',
+            'cancelled' => 'Hủy đăng ký!',
+            'deleted' => 'Xóa đăng ký!',
+            'reactivated' => 'Đăng ký lại!',
+        ];
+        $titleAction = $titleMap[$this->type] ?? 'Hoạt động đăng ký!';
+        $message->title("Tiệc trà {$venueName} - {$titleAction}");
+
         $message->icon('https://yeushenyun.com/shen-yun.webp');
 
         $remainingText = $remaining === 0
             ? "Đã FULL **{$session->capacity_total}** ghế"
             : "Còn lại: **{$remaining}/{$session->capacity_total}** ghế";
 
+        $statusTag = '';
+        if ($this->type === 'cancelled') {
+            $statusTag = '❌ ';
+        }
+        if ($this->type === 'deleted') {
+            $statusTag = '🗑️ ';
+        }
+        if ($this->type === 'updated') {
+            $statusTag = '⚙️ ';
+        }
+
+        $editUrl = url("/admin/registrations");
+
         $message->markdownBody(
-            "**{$this->registration->full_name}**{$attendWith} - 👥 **{$this->registration->total_count}** khách:\n" .
+            "{$statusTag}[**{$this->registration->full_name}**]({$editUrl}){$attendWith} - 👥 **{$this->registration->total_count}** khách:\n" .
             "_{$guestInfo}_\n\n" .
             "🗓 **{$dayOfWeek} {$dateTime}**\n" .
             "🎫 {$remainingText}"
         );
 
         $message->priority(Message::PRIORITY_HIGH);
-        $message->tags(['registration', 'event']);
-
-        $message->clickAction(
-            url("/admin/registrations")
-        );
+        $message->tags([$this->type === 'new' ? 'registration' : $this->type, 'event']);
 
         return $message;
     }
