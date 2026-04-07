@@ -22,7 +22,7 @@ class EnsureAdminAuthed
             if ($request->cookie('admin_remember') === $adminToken) {
                 Session::put('admin_authed', true);
             } else {
-                return redirect()->to('/admin/login');
+                return redirect()->guest('/admin/login');
             }
         }
 

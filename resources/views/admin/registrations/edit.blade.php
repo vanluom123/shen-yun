@@ -26,12 +26,6 @@
             </div>
         </div>
 
-        @if($registration->status === 'cancelled')
-            <div class="mb-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
-                Đăng ký này đã bị hủy.
-            </div>
-        @endif
-
         @php
             $inputClass = 'mt-2 w-full rounded-xl border bg-white px-3 py-2 text-sm outline-none focus:border-neutral-900';
             $normalBorder = 'border-neutral-300';
@@ -39,18 +33,46 @@
 
             $currentSession = $sessions->firstWhere('id', $registration->event_session_id);
             $isPastSession = $currentSession && $currentSession->starts_at->isPast();
-            $disabledAttr = $isPastSession ? 'disabled' : '';
-            $disabledClass = $isPastSession ? 'bg-neutral-100 opacity-70' : '';
+            $isCancelled = $registration->status === 'cancelled';
+            $isPending = $registration->status === 'pending';
+            $shouldDisable = $isPastSession || $isCancelled;
+            $disabledAttr = $shouldDisable ? 'disabled' : '';
+            $disabledClass = $shouldDisable ? 'bg-neutral-100 opacity-70' : '';
         @endphp
-
         @if($isPastSession)
             <div class="mb-6 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800">
                 <div class="font-semibold">⚠️ Trình chiếu này đã kết thúc</div>
                 Bạn chỉ có thể chỉnh sửa thông tin liên hệ (Họ tên, Email, SĐT). Các thông tin về trình chiếu và số lượng khách đã được khóa.
             </div>
+        @else
+            @if($isCancelled)
+                <div class="mb-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">
+                    <div class="font-semibold">🚫 Đăng ký này đã bị hủy</div>
+                    Thông tin trình chiếu và số lượng khách đã bị khóa. Bạn vẫn có thể chỉnh sửa thông tin liên hệ hoặc khôi phục đăng ký bên dưới.
+                </div>
+            @endif
+            @if($isPending || $isCancelled)
+                <div class="mb-8 border-b border-neutral-200 pb-6">
+                    <h3 class="text-lg font-semibold {{ $isCancelled ? 'text-amber-700' : 'text-green-700' }}">
+                        {{ $isCancelled ? 'Khôi phục đăng ký' : 'Xác nhận đăng ký' }}
+                    </h3>
+                    <p class="mt-1 text-sm text-neutral-600">
+                        {{ $isCancelled ? 'Bấm nút bên dưới để đưa đăng ký này trở lại danh sách tham dự.' : 'Bấm nút dưới đây để xác nhận khách tham dự buổi tiệc trà.' }}
+                    </p>
+                    <form method="post" action="{{ url('/admin/registrations/'.$registration->id.'/confirm') }}" class="mt-4">
+                        @csrf
+                        <input type="hidden" name="redirect_to" value="{{ url()->current() }}?back={{ urlencode($backUrl) }}">
+                        <button type="submit"
+                            {{ $isPastSession ? 'disabled' : '' }}
+                            class="rounded-xl border {{ $isCancelled ? 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100' : 'border-green-300 bg-green-50 text-green-700 hover:bg-green-100' }} px-5 py-3 text-sm font-semibold shadow-sm {{ $isPastSession ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer' }}">
+                            {{ $isCancelled ? 'Khôi phục' : 'Xác nhận' }}
+                        </button>
+                    </form>
+                </div>
+            @endif
         @endif
 
-        <form method="post" action="{{ url('/admin/registrations/'.$registration->id) }}?back={{ urlencode($backUrl) }}" class="max-w-2xl space-y-6" novalidate>
+        <form id="registration-form" method="post" action="{{ url('/admin/registrations/'.$registration->id) }}?back={{ urlencode($backUrl) }}" class="max-w-2xl space-y-6" novalidate>
             @csrf
             @method('put')
 
@@ -109,6 +131,9 @@
                             </option>
                         @endforeach
                     </select>
+                    @if($shouldDisable)
+                        <input type="hidden" name="event_session_id" value="{{ $registration->event_session_id }}">
+                    @endif
                 </div>
             </div>
 
@@ -125,6 +150,9 @@
                         {{ $disabledAttr }}
                         value="{{ old($field, $registration->$field) }}" required
                         class="{{ $inputClass }} {{ $disabledClass }} {{ $errors->has($field) ? $errorBorder : $normalBorder }}" />
+                    @if($shouldDisable)
+                        <input type="hidden" name="{{ $field }}" value="{{ $registration->$field }}">
+                    @endif
                 </div>
                 @endforeach
             </div>
@@ -147,11 +175,14 @@
                         <label for="attend_with_guest_no" class="text-sm">Không</label>
                     </div>
                 </div>
+                @if($shouldDisable)
+                    <input type="hidden" name="attend_with_guest" value="{{ $registration->attend_with_guest ? '1' : '0' }}">
+                @endif
             </div>
 
             <div class="flex items-center gap-4 pt-2">
-                <button type="submit"
-                    class="rounded-xl bg-neutral-900 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800 cursor-pointer">
+                <button type="submit" id="save-button" disabled
+                    class="rounded-xl bg-neutral-900 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all">
                     Lưu thay đổi
                 </button>
                 <a href="{{ $backUrl }}" class="rounded-xl border border-neutral-300 px-5 py-3 text-sm font-semibold text-neutral-700 hover:bg-neutral-50">
@@ -160,13 +191,39 @@
             </div>
         </form>
 
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.getElementById('registration-form');
+                const saveButton = document.getElementById('save-button');
+                
+                if (!form || !saveButton) return;
+
+                // Function to get current form state as a URLSearchParams string
+                const getFormState = () => new URLSearchParams(new FormData(form)).toString();
+                
+                // Store initial state
+                const initialState = getFormState();
+
+                const updateButtonState = () => {
+                    const currentState = getFormState();
+                    const hasChanged = currentState !== initialState;
+                    
+                    saveButton.disabled = !hasChanged;
+                };
+
+                // Listen for any input changes
+                form.addEventListener('input', updateButtonState);
+                form.addEventListener('change', updateButtonState);
+            });
+        </script>
+
         @if($registration->status === 'confirmed')
             <div class="mt-8 border-t border-neutral-200 pt-6">
                 <h3 class="text-lg font-semibold">Hủy đăng ký</h3>
                 <p class="mt-1 text-sm text-neutral-600">Hủy đăng ký sẽ giải phóng chỗ cho trình chiếu này.</p>
                 <form method="post" action="{{ url('/admin/registrations/'.$registration->id.'/cancel') }}" class="mt-4">
                     @csrf
-                    <input type="hidden" name="redirect_to" value="{{ $backUrl }}">
+                    <input type="hidden" name="redirect_to" value="{{ url()->current() }}?back={{ urlencode($backUrl) }}">
                     <button type="submit"
                         {{ $disabledAttr }}
                         class="rounded-xl border border-red-300 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 shadow-sm hover:bg-red-100 {{ $isPastSession ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer' }}"
@@ -179,7 +236,7 @@
 
         <div class="mt-8 border-t border-neutral-200 pt-6">
             <h3 class="text-lg font-semibold text-red-700">Xóa đăng ký</h3>
-            <p class="mt-1 text-sm text-neutral-600">Hành động này không thể hoàn tác.</p>
+            <p class="mt-1 text-sm text-neutral-600">Xóa người này khỏi danh sách đăng ký.</p>
             <form method="post" action="{{ url('/admin/registrations/'.$registration->id) }}" class="mt-4">
                 @csrf
                 @method('delete')

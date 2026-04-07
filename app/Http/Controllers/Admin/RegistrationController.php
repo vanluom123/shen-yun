@@ -397,14 +397,25 @@ class RegistrationController extends Controller
 
     public function confirm(Registration $registration)
     {
-        $wasPending = $registration->status === 'pending';
-        $sessionId = $registration->event_session_id;
+        $session = $registration->eventSession;
+        
+        // 1. Check if session is past
+        if ($session->starts_at->isPast()) {
+            return back()->withErrors(['error' => 'Không thể xác nhận đăng ký cho trình chiếu đã kết thúc.']);
+        }
+
+        // 2. Check capacity if moving from cancelled
+        if ($registration->status === 'cancelled') {
+            $totalGuests = $registration->total_count;
+            $remaining = $session->capacity_total - $session->capacity_reserved;
+            
+            if ($totalGuests > $remaining) {
+                return back()->withErrors(['error' => "Không thể kích hoạt lại. Buổi trình chiếu này chỉ còn {$remaining} chỗ trống, nhưng đăng ký này yêu cầu {$totalGuests} chỗ."]);
+            }
+        }
 
         $registration->update(['status' => 'confirmed']);
-
-        if ($wasPending) {
-            EventSession::recalculateReserved($sessionId);
-        }
+        EventSession::recalculateReserved($registration->event_session_id);
 
         $redirectTo = request()->input('redirect_to', '/admin/registrations');
         return redirect()->to($redirectTo)->with('success', 'Đã xác nhận đăng ký.');
@@ -412,14 +423,8 @@ class RegistrationController extends Controller
 
     public function cancel(Registration $registration)
     {
-        $wasConfirmed = $registration->status === 'confirmed';
-        $sessionId = $registration->event_session_id;
-
         $registration->update(['status' => 'cancelled']);
-
-        if ($wasConfirmed) {
-            EventSession::recalculateReserved($sessionId);
-        }
+        EventSession::recalculateReserved($registration->event_session_id);
 
         $redirectTo = request()->input('redirect_to', '/admin/registrations');
         return redirect()->to($redirectTo)->with('success', 'Đã hủy đăng ký.');

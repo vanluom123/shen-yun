@@ -18,7 +18,7 @@ class AdminAuthController extends Controller
                 Session::put('admin_authed', true);
             }
 
-            return redirect()->to('/admin');
+            return redirect()->intended('/admin');
         }
 
         return view('admin.login');
@@ -49,7 +49,7 @@ class AdminAuthController extends Controller
         $adminToken = hash_hmac('sha256', (string) config('rsvp.admin_password'), (string) config('app.key'));
         Cookie::queue('admin_remember', $adminToken, 43200);
 
-        return redirect()->to('/admin');
+        return redirect()->intended('/admin');
     }
 
     public function destroy()
