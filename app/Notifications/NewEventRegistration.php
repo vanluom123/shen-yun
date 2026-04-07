@@ -88,10 +88,11 @@ class NewEventRegistration extends Notification
             $statusTag = '⚙️ ';
         }
 
-        $editUrl = url("/admin/registrations");
+        $editUrl = config('app.url') . "/admin/registrations";
 
         $message->markdownBody(
-            "{$statusTag}[**{$this->registration->full_name}**]({$editUrl}){$attendWith} - 👥 **{$this->registration->total_count}** khách:\n" .
+            "{$statusTag}[**{$this->registration->full_name}**]({$editUrl}){$attendWith}\n" .
+            "👥 **{$this->registration->total_count}** khách:\n".
             "_{$guestInfo}_\n\n" .
             "🗓 **{$dayOfWeek} {$dateTime}**\n" .
             "🎫 {$remainingText}"
@@ -99,10 +100,6 @@ class NewEventRegistration extends Notification
 
         $message->priority(Message::PRIORITY_HIGH);
         $message->tags([$this->type === 'new' ? 'registration' : $this->type, 'event']);
-
-        $message->clickAction(
-            config('app.url') . "/admin/registrations"
-        );
 
         return $message;
     }
