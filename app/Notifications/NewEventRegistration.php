@@ -8,7 +8,9 @@ use Wijourdil\NtfyNotificationChannel\Channels\NtfyChannel;
 
 class NewEventRegistration extends Notification
 {
-    public function __construct(private $registration) {}
+    public function __construct(private $registration)
+    {
+    }
 
     public function via($notifiable): array
     {
@@ -18,18 +20,24 @@ class NewEventRegistration extends Notification
     public function toNtfy(mixed $notifiable): Message
     {
         $session = $this->registration->eventSession;
-        $venue = $session->venue ?? null;
-        
-        // Tính số ghế còn lại
-        $remaining = $session->capacity_total - $session->capacity_reserved;
-        
-        // Format ngày giờ
-        $startsAt = \Carbon\Carbon::parse($session->starts_at)->timezone('Asia/Ho_Chi_Minh');
-        $dayOfWeek = ucfirst($startsAt->locale('vi')->isoFormat('dddd')); // Thứ Hai, Thứ Ba...
+
+        if (!$session) {
+            throw new \RuntimeException('Event session not found');
+        }
+
+        $venueName = $session->venue?->name ?? 'Không rõ địa điểm';
+
+        $remaining = max(0, $session->capacity_total - $session->capacity_reserved);
+
+        $startsAt = \Carbon\Carbon::parse($session->starts_at)
+            ->setTimezone('Asia/Ho_Chi_Minh')
+            ->locale('vi');
+
+        $dayOfWeek = ucfirst($startsAt->isoFormat('dddd'));
         $dateTime = $startsAt->format('d/m/Y H:i');
-        
-        // Build chi tiết khách
+
         $guestDetails = [];
+
         if ($this->registration->adult_count > 0) {
             $guestDetails[] = "Khách: {$this->registration->adult_count}";
         }
@@ -42,21 +50,32 @@ class NewEventRegistration extends Notification
         if ($this->registration->child_count > 0) {
             $guestDetails[] = "Trẻ em: {$this->registration->child_count}";
         }
-        
-        $guestInfo = implode(', ', $guestDetails);
-        $attendWith = $this->registration->attend_with_guest ? ' (đi cùng)' : '';
+
+        $guestInfo = !empty($guestDetails)
+            ? implode(', ', $guestDetails)
+            : 'Không có thông tin khách';
+
+        $attendWith = $this->registration->attend_with_guest ? ' (đi cùng khách)' : '';
 
         $message = new Message();
-        $message->topic(config('ntfy-notification-channel.topic', 'tiec_tra_shenyun_alerts'));
-        $message->title('Đăng ký mới!');
+
+        $message->topic(config('ntfy-notification-channel.topic'));
+        $message->title("Tiệc trà {$venueName} - Đăng ký mới!");
+        $message->icon('https://yeushenyun.com/shen-yun.webp');
+
         $message->markdownBody(
-            "**{$this->registration->full_name}**{$attendWith} - {$this->registration->total_count} khách\n" .
-            "_{$guestInfo}_\n" .
-            "{$dayOfWeek}, {$dateTime}\n" .
-            "Còn lại: **{$remaining}**/**{$session->capacity_total}** ghế"
+            "**{$this->registration->full_name}**{$attendWith} - 👥 **{$this->registration->total_count}** khách:\n" .
+            "_{$guestInfo}_\n\n" .
+            "🗓 **{$dayOfWeek} {$dateTime}**\n" .
+            "🎫 Còn lại: **{$remaining}/{$session->capacity_total}** ghế"
         );
-        $message->tags(['bell', 'tada']);
-        $message->priority(4);
+
+        $message->priority(Message::PRIORITY_HIGH);
+        $message->tags(['registration', 'event']);
+
+        $message->clickAction(
+            url("/admin/registrations/{$this->registration->id}/edit")
+        );
 
         return $message;
     }
