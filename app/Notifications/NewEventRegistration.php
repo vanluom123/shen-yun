@@ -100,6 +100,10 @@ class NewEventRegistration extends Notification
         $message->priority(Message::PRIORITY_HIGH);
         $message->tags([$this->type === 'new' ? 'registration' : $this->type, 'event']);
 
+        $message->clickAction(
+            config('app.url') . "/admin/registrations"
+        );
+
         return $message;
     }
 }
