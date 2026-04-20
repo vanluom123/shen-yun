@@ -61,7 +61,7 @@
                     </p>
                     <form method="post" action="{{ url('/admin/registrations/'.$registration->id.'/confirm') }}" class="mt-4">
                         @csrf
-                        <input type="hidden" name="redirect_to" value="{{ url()->current() }}?back={{ urlencode($backUrl) }}">
+                        <input type="hidden" name="redirect_to" value="{{ $backUrl }}">
                         <button type="submit"
                             {{ $isPastSession ? 'disabled' : '' }}
                             class="rounded-xl border {{ $isCancelled ? 'border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100' : 'border-green-300 bg-green-50 text-green-700 hover:bg-green-100' }} px-5 py-3 text-sm font-semibold shadow-sm {{ $isPastSession ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer' }}">
@@ -223,7 +223,7 @@
                 <p class="mt-1 text-sm text-neutral-600">Hủy đăng ký sẽ giải phóng chỗ cho trình chiếu này.</p>
                 <form method="post" action="{{ url('/admin/registrations/'.$registration->id.'/cancel') }}" class="mt-4">
                     @csrf
-                    <input type="hidden" name="redirect_to" value="{{ url()->current() }}?back={{ urlencode($backUrl) }}">
+                    <input type="hidden" name="redirect_to" value="{{ $backUrl }}">
                     <button type="submit"
                         {{ $disabledAttr }}
                         class="rounded-xl border border-red-300 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 shadow-sm hover:bg-red-100 {{ $isPastSession ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer' }}"

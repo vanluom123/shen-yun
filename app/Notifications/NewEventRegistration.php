@@ -74,8 +74,8 @@ class NewEventRegistration extends Notification
         $message->icon('https://yeushenyun.com/shen-yun.webp');
 
         $remainingText = $remaining === 0
-            ? "Đã FULL **{$session->capacity_total}** ghế"
-            : "Còn lại: **{$remaining}/{$session->capacity_total}** ghế";
+            ? "Đã FULL {$session->capacity_total} ghế"
+            : "Còn lại: {$remaining}/{$session->capacity_total} ghế";
 
         $statusTag = '';
         if ($this->type === 'cancelled') {
@@ -88,15 +88,22 @@ class NewEventRegistration extends Notification
             $statusTag = '⚙️ ';
         }
 
-        $editUrl = config('app.url') . "/admin/registrations";
+        $editUrl = config('app.url') . "/admin/registrations/{$this->registration->id}/edit";
 
-        $message->markdownBody(
-            "{$statusTag}[**{$this->registration->full_name}**]({$editUrl}){$attendWith}\n" .
-            "👥 **{$this->registration->total_count}** khách:\n".
-            "_{$guestInfo}_\n\n" .
-            "🗓 **{$dayOfWeek} {$dateTime}**\n" .
+        $message->body(
+            "{$statusTag}{$this->registration->full_name}{$attendWith}\n" .
+            "👥 {$this->registration->total_count} khách:\n".
+            "{$guestInfo}\n\n" .
+            "🗓 {$dayOfWeek} {$dateTime}\n" .
             "🎫 {$remainingText}"
         );
+        
+        $message->clickAction($editUrl);
+        
+        $action = new \Ntfy\Action\View();
+        $action->label('Xem chi tiết');
+        $action->url($editUrl);
+        $message->action($action);
 
         $message->priority(Message::PRIORITY_HIGH);
         $message->tags([$this->type === 'new' ? 'registration' : $this->type, 'event']);
